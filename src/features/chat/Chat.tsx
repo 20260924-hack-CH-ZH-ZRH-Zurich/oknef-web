@@ -20,7 +20,7 @@ import {
 } from "./ChatChrome";
 import { ChatMessages } from "./ChatMessages";
 import { Composer } from "./Composer";
-import { parseCommand } from "./commands";
+import { parseCommand, workspacePath } from "./commands";
 import { withContext } from "./context";
 import { isImageRequest } from "./conversation";
 import { chatMessageTooLong } from "./limits";
@@ -152,6 +152,11 @@ export function Chat({
     )
       return;
     const command = parseCommand(input);
+    if (command.type === "navigate") {
+      router.push(workspacePath(locale, command.view));
+      setInput("");
+      return;
+    }
     if (command.type === "new") {
       reset();
       return;

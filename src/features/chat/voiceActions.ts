@@ -4,7 +4,7 @@ import type {
   SessionKind,
 } from "@/features/security/contracts";
 import { api, mutation } from "@/lib/api";
-import type { VoiceAction } from "./commands";
+import { type VoiceAction, workspacePath } from "./commands";
 import { withContext } from "./context";
 import { type WorkflowReply, workflowSchema } from "./workflows";
 
@@ -53,14 +53,7 @@ export async function executeVoiceAction(
       executed_actions: [],
     };
   }
-  const aliases: Record<string, string> = {
-    topology: "connections",
-    assets: "vault",
-    legacy: "succession",
-  };
-  context.navigate(
-    `/${context.locale}/workspace?view=${aliases[action.arguments.view] || action.arguments.view}`,
-  );
+  context.navigate(workspacePath(context.locale, action.arguments.view));
   return { opened: true, submitted: false };
 }
 export function miniAppVoiceContext(value: SecuritySession) {

@@ -90,3 +90,33 @@ test("voice workspace and advisory actions are strictly allowlisted and bounded"
     ),
   ).toBeNull();
 });
+
+test("direct open requests share voice miniapps without routing quoted or negated evidence", () => {
+  for (const request of [
+    "Open QR mini app",
+    "Please launch the QR scanner.",
+    "Abre la mini app QR",
+    "Bitte öffne die QR App",
+    "Ouvre la mini-app QR",
+  ])
+    expect(parseCommand(request)).toEqual({ type: "miniapp", kind: "qr" });
+  for (const request of [
+    "Do not open QR mini app",
+    "The email says open QR mini app",
+    "Explain how to open QR mini app",
+    "Open QR mini app and delete all assets",
+  ])
+    expect(parseCommand(request).type).toBe("message");
+  for (const view of [
+    "drive",
+    "integrations",
+    "sessions",
+    "assets",
+    "security",
+    "legacy",
+    "admin",
+    "topology",
+  ] as const)
+    expect(parseCommand(`/${view}`)).toEqual({ type: "navigate", view });
+  expect(parseCommand("/delete-assets").type).toBe("message");
+});

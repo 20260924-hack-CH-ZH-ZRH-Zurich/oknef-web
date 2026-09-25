@@ -91,10 +91,16 @@ export function ChatCommands({
       <div className="mt-3 flex flex-wrap gap-2">
         {[
           "/qr",
+          "/link",
+          "/email",
+          "/document",
           "/call",
           "/video",
           "/identity",
           "/plan",
+          "/drive",
+          "/sessions",
+          "/integrations",
           "@assets",
           "@sessions",
           "@integrations",

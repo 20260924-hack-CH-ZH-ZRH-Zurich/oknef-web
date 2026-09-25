@@ -9,8 +9,29 @@ export const miniAppNames = [
   "identity",
 ] as const;
 export type MiniAppName = (typeof miniAppNames)[number];
+export const workspaceViews = [
+  "miniapps",
+  "drive",
+  "integrations",
+  "topology",
+  "sessions",
+  "assets",
+  "security",
+  "legacy",
+  "admin",
+] as const;
+export type WorkspaceView = (typeof workspaceViews)[number];
+export function workspacePath(locale: string, view: string) {
+  const aliases: Record<string, string> = {
+    topology: "connections",
+    assets: "vault",
+    legacy: "succession",
+  };
+  return `/${locale}/workspace?view=${aliases[view] || view}`;
+}
 export type ChatCommand =
   | { type: "miniapp"; kind: MiniAppName }
+  | { type: "navigate"; view: WorkspaceView }
   | { type: "new" }
   | { type: "plan"; content: string }
   | { type: "message"; content: string };
@@ -18,6 +39,12 @@ export function parseCommand(input: string): ChatCommand {
   const trimmed = input.trim();
   const match = /^\/([a-z]+)(?:\s+([\s\S]*))?$/i.exec(trimmed);
   if (!match) {
+    const open =
+      /^(?:(?:please|por favor|bitte|s’il vous plaît)\s+)?(?:open|launch|start|abre|abrir|öffne|starte|ouvre|ouvrir|lance)\s+(?:(?:the|my|la|el|die|das|le|mon|mi)\s+)?(?:mini[ -]?app\s+)?(qr|link|email|call|document|video|identity)(?:\s+(?:mini[ -]?app|app|scanner))?[.!?]?$/i.exec(
+        trimmed,
+      );
+    if (open)
+      return { type: "miniapp", kind: open[1].toLowerCase() as MiniAppName };
     const patterns: [MiniAppName, RegExp][] = [
       [
         "qr",
@@ -52,6 +79,8 @@ export function parseCommand(input: string): ChatCommand {
   const command = match[1].toLowerCase();
   if (miniAppNames.includes(command as MiniAppName))
     return { type: "miniapp", kind: command as MiniAppName };
+  if (workspaceViews.includes(command as WorkspaceView))
+    return { type: "navigate", view: command as WorkspaceView };
   if (command === "new") return { type: "new" };
   if (command === "plan")
     return {
@@ -121,17 +150,7 @@ export function parseVoiceAction(
     if (
       name === "navigate_workspace" &&
       Object.keys(value).length === 1 &&
-      [
-        "miniapps",
-        "drive",
-        "integrations",
-        "topology",
-        "sessions",
-        "assets",
-        "security",
-        "legacy",
-        "admin",
-      ].includes(String(value.view))
+      workspaceViews.includes(String(value.view) as WorkspaceView)
     )
       return { name, arguments: { view: String(value.view) } };
   } catch {
