@@ -1,9 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { Button } from "@/components/ui/buttons/Button/Button";
-import { startDictation } from "@/features/chat/voice";
+import { AudioCapture } from "@/features/capture/AudioCapture";
+import { ImagePreview } from "@/features/capture/ImagePreview";
+import { useCaptureMessages } from "@/features/capture/messages";
+import { VideoCapture } from "@/features/capture/VideoCapture";
+import { DocumentResult } from "@/features/chat/DocumentResult";
+import type { DocumentReply } from "@/features/chat/documents";
 import { usePreferences } from "@/features/preferences/Preferences";
 import { useProductMessages } from "@/features/product/messages";
+import { CameraCapture } from "@/features/qr/CameraCapture";
 import type { SessionKind } from "@/features/security/contracts";
 import { api } from "@/lib/api";
 import { registerMediaStop } from "@/lib/mediaLifecycle";
@@ -14,12 +20,17 @@ export function MediaEvidence({
   kind,
   onText,
   onEvidence,
+  onDocument,
+  onBusyChange,
 }: {
   kind: SessionKind;
   onText: (value: string) => void;
   onEvidence: (file: File, source: Evidence["source"]) => Promise<void>;
+  onDocument?: (value: DocumentReply | undefined) => void;
+  onBusyChange?: (busy: boolean) => void;
 }) {
   const m = useProductMessages();
+  const capture = useCaptureMessages();
   const { locale } = usePreferences();
   const video = useRef<HTMLVideoElement>(null);
   const [file, setFile] = useState<File | null>(null);
@@ -28,22 +39,18 @@ export function MediaEvidence({
   const [pending, setPending] = useState(false);
   const [recording, setRecording] = useState(false);
   const [error, setError] = useState("");
-  const recorder = useRef<Awaited<ReturnType<typeof startDictation>> | null>(
-    null,
-  );
-  const recordingEpoch = useRef(0);
-  const recordingStarting = useRef(false);
+  const [prompt, setPrompt] = useState("");
+  const [documentResult, setDocumentResult] = useState<DocumentReply>();
   const mounted = useRef(true);
   const request = useRef<AbortController | null>(null);
+  useEffect(() => {
+    onBusyChange?.(pending || recording);
+  }, [pending, recording, onBusyChange]);
   useEffect(() => {
     mounted.current = true;
     const stop = () => {
       request.current?.abort();
       request.current = null;
-      recordingEpoch.current++;
-      recordingStarting.current = false;
-      recorder.current?.cancel();
-      recorder.current = null;
       if (mounted.current) {
         setRecording(false);
         setPending(false);
@@ -58,15 +65,18 @@ export function MediaEvidence({
     };
   }, []);
   useEffect(() => {
-    if (!file || kind !== "video") {
+    if (!file || !file.type.startsWith("video/")) {
       setPreview("");
       return;
     }
     const url = URL.createObjectURL(file);
     setPreview(url);
     return () => URL.revokeObjectURL(url);
-  }, [file, kind]);
-  async function choose(value: File | undefined) {
+  }, [file]);
+  async function choose(
+    value: File | undefined,
+    source: Evidence["source"] = "upload",
+  ) {
     setError("");
     if (!value) return;
     const allowed =
@@ -74,12 +84,14 @@ export function MediaEvidence({
         ? /^(audio\/(webm|wav|x-wav|mpeg|mp4|ogg)|video\/webm)$/
         : kind === "video"
           ? /^video\/(mp4|webm|quicktime)$/
-          : /^image\/(png|jpeg)$/;
+          : kind === "identity"
+            ? /^(image\/(png|jpeg)|video\/(mp4|webm|quicktime))$/
+            : /^image\/(png|jpeg)$/;
     if (
-      !allowed.test(value.type) ||
+      !allowed.test(value.type.split(";")[0]) ||
       value.size >
-        (kind === "video"
-          ? 25_000_000
+        (value.type.startsWith("video/") && kind !== "call"
+          ? 20 * 1024 * 1024
           : kind === "call"
             ? 12_000_000
             : 4_000_000)
@@ -87,8 +99,17 @@ export function MediaEvidence({
       setError(m.fileTooLarge);
       return;
     }
-    setFile(value);
-    await onEvidence(value, "upload");
+    setPending(true);
+    setFile(null);
+    setDocumentResult(undefined);
+    onDocument?.(undefined);
+    onText("");
+    try {
+      await onEvidence(value, source);
+      if (mounted.current) setFile(value);
+    } finally {
+      if (mounted.current) setPending(false);
+    }
   }
   async function transcribe(value: File, source: Evidence["source"]) {
     if (!mounted.current) return;
@@ -118,43 +139,6 @@ export function MediaEvidence({
       }
     }
   }
-  async function record() {
-    if (recordingStarting.current) {
-      recordingEpoch.current++;
-      recordingStarting.current = false;
-      setRecording(false);
-      return;
-    }
-    if (recording) {
-      recorder.current?.stop();
-      return;
-    }
-    setError("");
-    const epoch = recordingEpoch.current;
-    recordingStarting.current = true;
-    setRecording(true);
-    try {
-      const handle = await startDictation((blob) => {
-        if (mounted.current && recordingEpoch.current === epoch)
-          void transcribe(
-            new File([blob], "call-recording.webm", { type: blob.type }),
-            "microphone",
-          );
-      });
-      if (!mounted.current || recordingEpoch.current !== epoch) handle.cancel();
-      else {
-        recorder.current = handle;
-        setRecording(true);
-      }
-    } catch {
-      if (mounted.current && recordingEpoch.current === epoch) {
-        setError(m.cameraError);
-        setRecording(false);
-      }
-    } finally {
-      if (recordingEpoch.current === epoch) recordingStarting.current = false;
-    }
-  }
   async function extract() {
     if (!file) return;
     const controller = new AbortController();
@@ -162,14 +146,21 @@ export function MediaEvidence({
     setPending(true);
     setError("");
     try {
-      const text = await analyzeMedia(
+      const result = await analyzeMedia(
         file,
         kind,
         video.current,
         locale,
         controller.signal,
+        prompt,
       );
-      if (mounted.current && !controller.signal.aborted) onText(text);
+      if (mounted.current && !controller.signal.aborted) {
+        onText(result.text);
+        if ("document" in result) {
+          setDocumentResult(result.document);
+          onDocument?.(result.document);
+        }
+      }
     } catch {
       if (mounted.current && !controller.signal.aborted) setError(m.error);
     } finally {
@@ -182,6 +173,23 @@ export function MediaEvidence({
   return (
     <section className="rounded-2xl border border-border p-4 space-y-4">
       <p className="text-xs leading-6 text-secondary">{m.mediaBoundary}</p>
+      {(kind === "document" || kind === "identity") && (
+        <CameraCapture
+          facingMode={kind === "identity" ? "user" : "environment"}
+          name={kind === "identity" ? "portrait" : "document"}
+          help={capture.photoHelp}
+          captureLabel={capture.capturePhoto}
+          disabled={pending || recording}
+          onCapture={(value) => choose(value, "camera")}
+        />
+      )}
+      {(kind === "video" || kind === "identity") && (
+        <VideoCapture
+          disabled={pending || recording}
+          face={kind === "identity"}
+          onCapture={(value) => choose(value, "camera")}
+        />
+      )}
       <label className="block">
         <span className="field-label">{m.upload}</span>
         <input
@@ -193,13 +201,21 @@ export function MediaEvidence({
               ? "audio/*"
               : kind === "video"
                 ? "video/mp4,video/webm,video/quicktime"
-                : "image/png,image/jpeg"
+                : kind === "identity"
+                  ? "image/png,image/jpeg,video/mp4,video/webm,video/quicktime"
+                  : "image/png,image/jpeg"
           }
-          onChange={(event) =>
-            void choose(event.target.files?.[0]).catch(() => setError(m.error))
-          }
+          onChange={(event) => {
+            void choose(event.target.files?.[0]).catch(() => setError(m.error));
+            event.target.value = "";
+          }}
         />
       </label>
+      {file && (
+        <p className="text-xs text-secondary">
+          {capture.file}: {file.name} · {file.size} {m.bytes}
+        </p>
+      )}
       {preview && (
         <video
           ref={video}
@@ -211,6 +227,23 @@ export function MediaEvidence({
           className="max-h-72 w-full rounded-xl bg-rail"
           aria-label={m.videoPreview}
         />
+      )}
+      {file?.type.startsWith("image/") && (
+        <ImagePreview file={file} label={capture.file} />
+      )}
+      {kind !== "call" && (
+        <label className="block">
+          <span className="field-label">{capture.prompt}</span>
+          <textarea
+            className="field"
+            value={prompt}
+            disabled={pending}
+            maxLength={1000}
+            rows={2}
+            onChange={(event) => setPrompt(event.target.value)}
+          />
+          <span className="subtext">{capture.promptHelp}</span>
+        </label>
       )}
       <label className="flex items-start gap-3 text-xs leading-6">
         <input
@@ -224,14 +257,11 @@ export function MediaEvidence({
       <div className="flex flex-wrap gap-2">
         {kind === "call" ? (
           <>
-            <Button
-              type="button"
-              variant="secondary"
+            <AudioCapture
               disabled={!consent || pending}
-              onClick={record}
-            >
-              {recording ? m.stopRecording : m.microphone}
-            </Button>
+              onRecordingChange={setRecording}
+              onCapture={(value) => transcribe(value, "microphone")}
+            />
             <Button
               type="button"
               disabled={!consent || !file || pending || recording}
@@ -246,7 +276,11 @@ export function MediaEvidence({
             disabled={!consent || !file || pending}
             onClick={extract}
           >
-            {kind === "video" ? m.reviewFrame : m.extract}
+            {file?.type.startsWith("video/")
+              ? capture.reviewFrames
+              : kind === "identity"
+                ? capture.reviewVisual
+                : m.extract}
           </Button>
         )}
       </div>
@@ -256,6 +290,7 @@ export function MediaEvidence({
           {error}
         </p>
       )}
+      {documentResult && <DocumentResult result={documentResult} />}
     </section>
   );
 }

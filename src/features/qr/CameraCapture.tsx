@@ -1,36 +1,53 @@
 import { Camera, CameraOff } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/buttons/Button/Button";
 import { useProductMessages } from "@/features/product/messages";
+import { registerMediaStop } from "@/lib/mediaLifecycle";
 export function CameraCapture({
   onCapture,
+  facingMode = "environment",
+  name = "qr-camera",
+  disabled = false,
+  help,
+  captureLabel,
 }: {
   onCapture: (file: File) => Promise<void>;
+  facingMode?: "environment" | "user";
+  name?: string;
+  disabled?: boolean;
+  help?: string;
+  captureLabel?: string;
 }) {
   const m = useProductMessages();
   const video = useRef<HTMLVideoElement>(null);
   const stream = useRef<MediaStream | null>(null);
   const generation = useRef(0);
+  const mounted = useRef(true);
   const [active, setActive] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
-  function stop() {
+  const stop = useCallback(() => {
     generation.current++;
     stream.current?.getTracks().forEach((track) => {
       track.stop();
     });
     stream.current = null;
-    setActive(false);
-  }
-  useEffect(
-    () => () => {
-      generation.current++;
-      stream.current?.getTracks().forEach((track) => {
-        track.stop();
-      });
-    },
-    [],
-  );
+    if (video.current) video.current.srcObject = null;
+    if (mounted.current) {
+      setActive(false);
+      setBusy(false);
+    }
+  }, []);
+  useEffect(() => {
+    mounted.current = true;
+    const dispose = registerMediaStop(stop);
+    window.addEventListener("pagehide", stop);
+    return () => {
+      mounted.current = false;
+      window.removeEventListener("pagehide", stop);
+      dispose();
+    };
+  }, [stop]);
   async function start() {
     setError(false);
     setBusy(true);
@@ -38,7 +55,7 @@ export function CameraCapture({
     try {
       const media = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: "environment",
+          facingMode: { ideal: facingMode },
           width: { ideal: 1280 },
           height: { ideal: 720 },
         },
@@ -57,41 +74,56 @@ export function CameraCapture({
         await video.current.play();
       }
     } catch {
-      stop();
-      setError(true);
+      if (current === generation.current) {
+        stop();
+        if (mounted.current) setError(true);
+      }
     } finally {
-      setBusy(false);
+      if (mounted.current && current === generation.current) setBusy(false);
     }
   }
   async function capture() {
     if (!video.current?.videoWidth) return;
     setBusy(true);
     setError(false);
+    const current = generation.current;
     try {
       const canvas = document.createElement("canvas");
-      canvas.width = video.current.videoWidth;
-      canvas.height = video.current.videoHeight;
+      const scale = Math.min(
+        1,
+        1600 / Math.max(video.current.videoWidth, video.current.videoHeight),
+      );
+      canvas.width = Math.round(video.current.videoWidth * scale);
+      canvas.height = Math.round(video.current.videoHeight * scale);
       const context = canvas.getContext("2d");
       if (!context) throw new Error("canvas unavailable");
-      context.drawImage(video.current, 0, 0);
+      context.drawImage(video.current, 0, 0, canvas.width, canvas.height);
       const blob = await new Promise<Blob>((resolve, reject) =>
         canvas.toBlob(
           (value) =>
             value ? resolve(value) : reject(new Error("capture failed")),
-          "image/png",
+          name === "qr-camera" ? "image/png" : "image/jpeg",
+          0.9,
         ),
       );
-      await onCapture(new File([blob], "qr-camera.png", { type: "image/png" }));
+      if (!mounted.current || current !== generation.current) return;
+      await onCapture(
+        new File(
+          [blob],
+          `${name}.${blob.type === "image/png" ? "png" : "jpg"}`,
+          { type: blob.type },
+        ),
+      );
       stop();
     } catch {
-      setError(true);
+      if (mounted.current && current === generation.current) setError(true);
     } finally {
-      setBusy(false);
+      if (mounted.current && current === generation.current) setBusy(false);
     }
   }
   return (
     <div className="space-y-3">
-      <p className="subtext">{m.cameraHelp}</p>
+      <p className="subtext">{help || m.cameraHelp}</p>
       <video
         ref={video}
         muted
@@ -103,15 +135,15 @@ export function CameraCapture({
         <Button
           type="button"
           variant="secondary"
-          disabled={busy}
-          onClick={active ? stop : start}
+          disabled={disabled && !active && !busy}
+          onClick={active || busy ? stop : start}
         >
           {active ? <CameraOff size={16} /> : <Camera size={16} />}
-          {active ? m.stopCamera : m.capture}
+          {active || busy ? m.stopCamera : m.capture}
         </Button>
         {active && (
-          <Button type="button" disabled={busy} onClick={capture}>
-            {m.takePhoto}
+          <Button type="button" disabled={busy || disabled} onClick={capture}>
+            {captureLabel || m.takePhoto}
           </Button>
         )}
       </div>
