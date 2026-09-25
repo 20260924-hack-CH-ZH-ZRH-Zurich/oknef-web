@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useCaptureBoundary } from "@/features/capture/useCaptureBoundary";
 import { usePreferences } from "@/features/preferences/Preferences";
 import { CameraCapture } from "./CameraCapture";
 import { decodeQrImage } from "./decode";
@@ -42,10 +43,13 @@ const messages = {
 export function QrCapture({
   onDecoded,
   onEvidence,
+  onBusyChange,
 }: {
   onDecoded: (content: string) => void;
   onEvidence?: (file: File, source: "camera" | "upload") => Promise<void>;
+  onBusyChange?: (busy: boolean) => void;
 }) {
+  const boundary = useCaptureBoundary();
   const { locale } = usePreferences();
   const text = messages[locale];
   const [status, setStatus] = useState<"busy" | "error" | "result" | null>(
@@ -56,15 +60,25 @@ export function QrCapture({
     source: "camera" | "upload" = "upload",
   ) {
     if (!file) return;
+    const epoch = ++boundary.current.epoch;
     setStatus("busy");
+    onBusyChange?.(true);
+    onDecoded("");
     try {
       if (file.name.toLowerCase().endsWith(".json"))
         file = await qrImageFromExport(file);
-      onDecoded(await decodeQrImage(file));
+      const decoded = await decodeQrImage(file);
+      if (!boundary.current.mounted || epoch !== boundary.current.epoch) return;
       await onEvidence?.(file, source);
+      if (!boundary.current.mounted || epoch !== boundary.current.epoch) return;
+      onDecoded(decoded);
       setStatus("result");
     } catch {
-      setStatus("error");
+      if (boundary.current.mounted && epoch === boundary.current.epoch)
+        setStatus("error");
+    } finally {
+      if (boundary.current.mounted && epoch === boundary.current.epoch)
+        onBusyChange?.(false);
     }
   }
   return (
@@ -78,7 +92,10 @@ export function QrCapture({
           accept="image/png,image/jpeg,image/webp,application/json"
           capture="environment"
           disabled={status === "busy"}
-          onChange={(event) => read(event.target.files?.[0])}
+          onChange={(event) => {
+            void read(event.target.files?.[0]);
+            event.target.value = "";
+          }}
         />
       </label>
       <p className="subtext mt-2">{text.help}</p>

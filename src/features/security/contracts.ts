@@ -20,6 +20,27 @@ const signalSchema = z
     provenance: z.literal("deterministic_rule"),
   })
   .strict();
+const storedEvidenceSchema = z.discriminatedUnion("provenance", [
+  evidenceSchema
+    .extend({
+      id: z.string(),
+      provenance: z.literal("client_reported_metadata"),
+      bytes_retained: z.literal(false),
+      digest_verified: z.literal(false),
+    })
+    .strict(),
+  evidenceSchema
+    .extend({
+      id: z.string(),
+      provenance: z.literal("server_received_upload"),
+      bytes_retained: z.literal(false),
+      digest_verified: z.literal(true),
+      received_at: z.number().int().nonnegative(),
+      source_verified: z.literal(false),
+      content_provenance: z.literal("user_reviewed_extraction"),
+    })
+    .strict(),
+]);
 export const sessionSchema = z
   .object({
     id: z.string(),
@@ -27,18 +48,7 @@ export const sessionSchema = z
     title: z.string(),
     content: z.string(),
     reference_text: z.string().nullable().optional(),
-    evidence: z
-      .array(
-        evidenceSchema
-          .extend({
-            id: z.string(),
-            provenance: z.literal("client_reported_metadata"),
-            bytes_retained: z.literal(false),
-            digest_verified: z.literal(false),
-          })
-          .strict(),
-      )
-      .optional(),
+    evidence: z.array(storedEvidenceSchema).optional(),
     asset_ids: z.array(z.string()).optional(),
     parent_session_id: z.string().nullable().optional(),
     created_at: timestampSchema,
