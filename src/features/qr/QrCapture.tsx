@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCaptureBoundary } from "@/features/capture/useCaptureBoundary";
 import { usePreferences } from "@/features/preferences/Preferences";
 import { CameraCapture } from "./CameraCapture";
@@ -49,12 +49,18 @@ export function QrCapture({
   onEvidence?: (file: File, source: "camera" | "upload") => Promise<void>;
   onBusyChange?: (busy: boolean) => void;
 }) {
-  const boundary = useCaptureBoundary();
   const { locale } = usePreferences();
   const text = messages[locale];
   const [status, setStatus] = useState<"busy" | "error" | "result" | null>(
     null,
   );
+  const [cameraActive, setCameraActive] = useState(false);
+  const boundary = useCaptureBoundary(() => {
+    setStatus(null);
+  });
+  useEffect(() => {
+    onBusyChange?.(status === "busy" || cameraActive);
+  }, [status, cameraActive, onBusyChange]);
   async function read(
     file: File | undefined,
     source: "camera" | "upload" = "upload",
@@ -62,7 +68,6 @@ export function QrCapture({
     if (!file) return;
     const epoch = ++boundary.current.epoch;
     setStatus("busy");
-    onBusyChange?.(true);
     onDecoded("");
     try {
       if (file.name.toLowerCase().endsWith(".json"))
@@ -76,14 +81,14 @@ export function QrCapture({
     } catch {
       if (boundary.current.mounted && epoch === boundary.current.epoch)
         setStatus("error");
-    } finally {
-      if (boundary.current.mounted && epoch === boundary.current.epoch)
-        onBusyChange?.(false);
     }
   }
   return (
     <div className="rounded-2xl border border-border p-4 space-y-4">
-      <CameraCapture onCapture={(file) => read(file, "camera")} />
+      <CameraCapture
+        onActiveChange={setCameraActive}
+        onCapture={(file) => read(file, "camera")}
+      />
       <label className="block">
         <span className="field-label">{text.label}</span>
         <input

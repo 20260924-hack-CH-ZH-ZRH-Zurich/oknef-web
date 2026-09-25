@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { Button } from "@/components/ui/buttons/Button/Button";
 import { AudioCapture } from "@/features/capture/AudioCapture";
-import { ImagePreview } from "@/features/capture/ImagePreview";
 import { observeCaptureLifecycle } from "@/features/capture/lifecycle";
+import { MediaPreview } from "@/features/capture/MediaPreview";
 import { useCaptureMessages } from "@/features/capture/messages";
 import { VideoCapture } from "@/features/capture/VideoCapture";
 import { DocumentResult } from "@/features/chat/DocumentResult";
@@ -32,20 +32,21 @@ export function MediaEvidence({
   const m = useProductMessages();
   const capture = useCaptureMessages();
   const { locale } = usePreferences();
-  const video = useRef<HTMLVideoElement>(null);
   const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState("");
   const [consent, setConsent] = useState(false);
   const [pending, setPending] = useState(false);
   const [recording, setRecording] = useState(false);
+  const [cameraActive, setCameraActive] = useState(false);
+  const [videoActive, setVideoActive] = useState(false);
+  const locked = pending || recording || cameraActive || videoActive;
   const [error, setError] = useState("");
   const [prompt, setPrompt] = useState("");
   const [documentResult, setDocumentResult] = useState<DocumentReply>();
   const mounted = useRef(true);
   const request = useRef<AbortController | null>(null);
   useEffect(() => {
-    onBusyChange?.(pending || recording);
-  }, [pending, recording, onBusyChange]);
+    onBusyChange?.(locked);
+  }, [locked, onBusyChange]);
   useEffect(() => {
     mounted.current = true;
     const stop = () => {
@@ -62,15 +63,6 @@ export function MediaEvidence({
       dispose();
     };
   }, []);
-  useEffect(() => {
-    if (!file || !file.type.startsWith("video/")) {
-      setPreview("");
-      return;
-    }
-    const url = URL.createObjectURL(file);
-    setPreview(url);
-    return () => URL.revokeObjectURL(url);
-  }, [file]);
   async function choose(
     value: File | undefined,
     source: Evidence["source"] = "upload",
@@ -147,7 +139,6 @@ export function MediaEvidence({
       const result = await analyzeMedia(
         file,
         kind,
-        video.current,
         locale,
         controller.signal,
         prompt,
@@ -177,13 +168,15 @@ export function MediaEvidence({
           name={kind === "identity" ? "portrait" : "document"}
           help={capture.photoHelp}
           captureLabel={capture.capturePhoto}
-          disabled={pending || recording}
+          disabled={pending || recording || videoActive}
+          onActiveChange={setCameraActive}
           onCapture={(value) => choose(value, "camera")}
         />
       )}
       {(kind === "video" || kind === "identity") && (
         <VideoCapture
-          disabled={pending || recording}
+          disabled={pending || recording || cameraActive}
+          onActiveChange={setVideoActive}
           face={kind === "identity"}
           onCapture={(value) => choose(value, "camera")}
         />
@@ -193,7 +186,7 @@ export function MediaEvidence({
         <input
           className="field"
           type="file"
-          disabled={pending || recording}
+          disabled={locked}
           accept={
             kind === "call"
               ? "audio/*"
@@ -214,21 +207,7 @@ export function MediaEvidence({
           {capture.file}: {file.name} · {file.size} {m.bytes}
         </p>
       )}
-      {preview && (
-        <video
-          ref={video}
-          src={preview}
-          controls
-          muted
-          playsInline
-          preload="metadata"
-          className="max-h-72 w-full rounded-xl bg-rail"
-          aria-label={m.videoPreview}
-        />
-      )}
-      {file?.type.startsWith("image/") && (
-        <ImagePreview file={file} label={capture.file} />
-      )}
+      {file && <MediaPreview file={file} label={capture.file} />}
       {kind !== "call" && (
         <label className="block">
           <span className="field-label">{capture.prompt}</span>
@@ -247,7 +226,7 @@ export function MediaEvidence({
         <input
           type="checkbox"
           checked={consent}
-          disabled={pending || recording}
+          disabled={locked}
           onChange={(event) => setConsent(event.target.checked)}
         />
         {m.consent}
@@ -262,7 +241,7 @@ export function MediaEvidence({
             />
             <Button
               type="button"
-              disabled={!consent || !file || pending || recording}
+              disabled={!consent || !file || locked}
               onClick={() => file && transcribe(file, "upload")}
             >
               {m.transcribe}
@@ -271,7 +250,7 @@ export function MediaEvidence({
         ) : (
           <Button
             type="button"
-            disabled={!consent || !file || pending}
+            disabled={!consent || !file || locked}
             onClick={extract}
           >
             {file?.type.startsWith("video/")

@@ -9,10 +9,12 @@ export function VideoCapture({
   onCapture,
   disabled,
   face = false,
+  onActiveChange,
 }: {
   onCapture: (file: File) => Promise<void>;
   disabled: boolean;
   face?: boolean;
+  onActiveChange?: (active: boolean) => void;
 }) {
   const m = useCaptureMessages();
   const video = useRef<HTMLVideoElement>(null);
@@ -25,6 +27,9 @@ export function VideoCapture({
   >("idle");
   const [audio, setAudio] = useState(false);
   const [error, setError] = useState(false);
+  useEffect(() => {
+    onActiveChange?.(state !== "idle");
+  }, [state, onActiveChange]);
   const cancel = useCallback(() => {
     epoch.current++;
     recorder.current?.cancel();

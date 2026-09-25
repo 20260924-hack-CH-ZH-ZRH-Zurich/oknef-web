@@ -32,10 +32,17 @@ export function SessionForm({
   parentSessionId?: string;
 }) {
   const m = useSecurityMessages();
-  const boundary = useCaptureBoundary();
   const product = useProductMessages();
   const capture = useCaptureMessages();
   const { locale } = usePreferences();
+  const label =
+    kind === "document"
+      ? capture.document
+      : kind === "identity"
+        ? capture.face
+        : kind
+          ? m[kind]
+          : m.newSession;
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const [savedWithoutOriginal, setSavedWithoutOriginal] =
@@ -54,6 +61,10 @@ export function SessionForm({
     file: File;
     metadata: Evidence;
   } | null>(null);
+  const boundary = useCaptureBoundary(() => {
+    setPending(false);
+    setMediaBusy(false);
+  });
   const previousKind = useRef(kind);
   useEffect(() => {
     if (previousKind.current === kind) return;
@@ -138,7 +149,13 @@ export function SessionForm({
       kind && (
         <form key={kind} onSubmit={submit} className="space-y-5">
           <p className="rounded-xl bg-muted p-4 text-xs leading-6 text-secondary">
-            {m[`${kind}Help`]}
+            {kind === "identity"
+              ? capture.faceHelp
+              : kind === "video"
+                ? capture.videoHelp
+                : kind === "document"
+                  ? capture.photoHelp
+                  : m[`${kind}Help`]}
           </p>
           <label className="block">
             <span className="field-label">{m.sessionName}</span>
@@ -256,16 +273,14 @@ export function SessionForm({
   if (inline)
     return (
       <section className="rounded-2xl border border-good/40 bg-surface p-5">
-        <h2 className="mb-5 text-lg font-semibold">
-          {kind ? m[kind] : m.newSession}
-        </h2>
+        <h2 className="mb-5 text-lg font-semibold">{label}</h2>
         {form}
       </section>
     );
   return (
     <Dialog
       open={kind !== null}
-      title={kind ? m[kind] : m.newSession}
+      title={label}
       onClose={onClose}
       closeLabel={m.close}
     >

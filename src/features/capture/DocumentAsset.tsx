@@ -29,13 +29,15 @@ export function DocumentAsset({
   onDone: () => void;
 }) {
   const m = useCaptureMessages();
-  const boundary = useCaptureBoundary();
   const [name, setName] = useState(defaultName);
   const [notes, setNotes] = useState(documentNotes(document));
   const [confirmed, setConfirmed] = useState(false);
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">(
     "idle",
   );
+  const boundary = useCaptureBoundary(() => {
+    setStatus((previous) => (previous === "saving" ? "error" : previous));
+  });
   async function save() {
     if (!confirmed || !name.trim() || status === "saving" || status === "saved")
       return;

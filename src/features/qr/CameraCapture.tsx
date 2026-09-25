@@ -10,6 +10,7 @@ export function CameraCapture({
   disabled = false,
   help,
   captureLabel,
+  onActiveChange,
 }: {
   onCapture: (file: File) => Promise<void>;
   facingMode?: "environment" | "user";
@@ -17,6 +18,7 @@ export function CameraCapture({
   disabled?: boolean;
   help?: string;
   captureLabel?: string;
+  onActiveChange?: (active: boolean) => void;
 }) {
   const m = useProductMessages();
   const video = useRef<HTMLVideoElement>(null);
@@ -26,6 +28,9 @@ export function CameraCapture({
   const [active, setActive] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
+  useEffect(() => {
+    onActiveChange?.(active || busy);
+  }, [active, busy, onActiveChange]);
   const stop = useCallback(() => {
     generation.current++;
     stream.current?.getTracks().forEach((track) => {

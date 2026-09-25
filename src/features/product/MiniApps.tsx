@@ -63,7 +63,9 @@ export function MiniAppLauncher({
               ? capture.videoHelp
               : kind === "identity"
                 ? capture.faceHelp
-                : m[`${kind}Help`]}
+                : kind === "document"
+                  ? capture.photoHelp
+                  : m[`${kind}Help`]}
           </p>
         </button>
       ))}
