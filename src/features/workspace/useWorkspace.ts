@@ -13,6 +13,7 @@ import {
 } from "@/lib/api";
 import type { TranslationKey } from "@/lib/i18n/en";
 import { listenSessionChange, stopActiveMedia } from "@/lib/mediaLifecycle";
+import { startWorkspaceSocket } from "./workspaceSocket";
 export function useWorkspace() {
   const [user, setUser] = useState<User | null>(null);
   const [data, setData] = useState<Dashboard | null>(null);
@@ -78,42 +79,19 @@ export function useWorkspace() {
       window.removeEventListener("focus", refresh);
     };
   }, [refresh]);
-  const userId = user ? `${user.id}:${user.tenant_id}` : null;
+  const userId = user ? `${user.tenant_id}:${user.id}` : null;
   useEffect(() => {
+    setConnected(false);
     if (!userId) return;
-    let socket: WebSocket;
-    let reconnect: ReturnType<typeof setTimeout>;
-    let closed = false;
-    let delay = 1000;
-    let update: ReturnType<typeof setTimeout>;
-    const connect = () => {
-      const url = new URL("/api/ws", window.location.origin);
-      url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
-      socket = new WebSocket(url);
-      socket.onopen = () => {
-        setConnected(true);
-        delay = 1000;
-      };
-      socket.onmessage = () => {
-        clearTimeout(update);
-        update = setTimeout(refresh, 200);
-      };
-      socket.onclose = () => {
-        setConnected(false);
-        if (!closed) {
-          reconnect = setTimeout(connect, delay);
-          delay = Math.min(delay * 2, 30000);
-        }
-      };
-      socket.onerror = () => socket.close();
-    };
-    connect();
-    return () => {
-      closed = true;
-      clearTimeout(reconnect);
-      clearTimeout(update);
-      socket?.close();
-    };
+    const url = new URL("/api/ws", window.location.origin);
+    url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
+    return startWorkspaceSocket({
+      createSocket: () => new WebSocket(url),
+      isCurrent: () =>
+        alive.current && !changing.current && identity.current === userId,
+      onConnectionChange: setConnected,
+      onRefresh: refresh,
+    });
   }, [userId, refresh]);
   return { user, data, error, connected, refresh };
 }
