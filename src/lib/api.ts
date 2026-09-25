@@ -39,6 +39,10 @@ export const assetSchema = z
     currency: z.string(),
     notes: z.string(),
     beneficiary: z.string(),
+    source_session_id: z.string().optional(),
+    source_provenance: z.literal("user_confirmed_evidence").optional(),
+    created_by: z.string().optional(),
+    synthetic: z.boolean().optional(),
     created_at: timestampSchema,
     updated_at: timestampSchema,
   })
