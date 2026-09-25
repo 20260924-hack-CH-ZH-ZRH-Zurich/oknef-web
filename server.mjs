@@ -9,6 +9,11 @@ const config = runtimeConfig();
 const extensionSockets = extensionSocketGateway(config);
 let handle;
 const server = createServer(async (request, response) => {
+  // Bun + Next can miss upgrades on connections previously used for HTTP.
+  if (process.versions.bun) {
+    response.shouldKeepAlive = false;
+    response.setHeader("Connection", "close");
+  }
   if (!(await extensionSockets.handle(request, response)))
     handle(request, response);
 });
