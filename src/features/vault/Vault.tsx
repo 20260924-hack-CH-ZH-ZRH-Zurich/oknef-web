@@ -32,12 +32,13 @@ const itemSchema = z
   })
   .strict();
 type VaultItem = z.infer<typeof itemSchema>;
-export function Vault() {
-  const { locale } = usePreferences();
+export function Vault({ owner }: { owner: string }) {
+  const { locale, t } = usePreferences();
   const text = vaultMessages[locale];
   const [key, setKey] = useState<CryptoKey | null>(null);
   const activeKey = useRef<CryptoKey | null>(null);
   const [items, setItems] = useState<VaultItem[]>([]);
+  const [loaded, setLoaded] = useState(false);
   const [opened, setOpened] = useState<Record<string, VaultSecret>>({});
   const [adding, setAdding] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
@@ -50,6 +51,7 @@ export function Vault() {
         z.object({ items: z.array(itemSchema) }).strict(),
       );
       setItems(result.items);
+      setLoaded(true);
     } catch {
       setError("error");
     }
@@ -70,7 +72,16 @@ export function Vault() {
   useEffect(() => {
     if (!key) return;
     const timer = setTimeout(lock, 5 * 60 * 1000);
-    return () => clearTimeout(timer);
+    const hide = () => {
+      if (document.visibilityState === "hidden") lock();
+    };
+    document.addEventListener("visibilitychange", hide);
+    window.addEventListener("pagehide", lock);
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener("visibilitychange", hide);
+      window.removeEventListener("pagehide", lock);
+    };
   }, [key, lock]);
   async function save(envelope: Envelope) {
     await api("/vault", itemSchema, mutation("POST", { envelope }));
@@ -161,8 +172,15 @@ export function Vault() {
           {text[error]}
         </p>
       )}
-      {!key ? (
+      {!loaded ? (
+        <section className="panel mt-8">
+          <output>{t(error ? "error" : "loading")}</output>
+          {error && <Button onClick={refresh}>{t("retry")}</Button>}
+        </section>
+      ) : !key ? (
         <VaultUnlock
+          owner={owner}
+          verificationEnvelope={items[0]?.envelope}
           onUnlock={(value) => {
             activeKey.current = value;
             setKey(value);

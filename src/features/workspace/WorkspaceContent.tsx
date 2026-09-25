@@ -145,7 +145,9 @@ export function WorkspaceContent({
           {view === "vault" && (
             <Assets assets={data.assets} refresh={refresh} />
           )}{" "}
-          {view === "secrets" && <Vault />}
+          {view === "secrets" && (
+            <Vault owner={`${user.tenant_id}:${user.id}`} />
+          )}
           {view === "files" && <LocalFiles />}
           {view === "approvals" && (
             <Approvals user={user} revision={data} refreshWorkspace={refresh} />

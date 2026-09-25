@@ -1,16 +1,43 @@
 import { Download, Eye, EyeOff, KeyRound, LockKeyhole } from "lucide-react";
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/buttons/Button/Button";
 import { usePreferences } from "@/features/preferences/Preferences";
-import { createVaultKey, importVaultKey } from "@/lib/vault";
+import {
+  enrollDeviceVault,
+  forgetDeviceVault,
+  readDeviceVault,
+  unlockDeviceVault,
+} from "@/lib/deviceVault";
+import {
+  createVaultKey,
+  decryptSecret,
+  type Envelope,
+  importVaultKey,
+} from "@/lib/vault";
+import { deviceMessages } from "./deviceMessages";
 import { vaultMessages } from "./messages";
 export function VaultUnlock({
   onUnlock,
+  owner,
+  verificationEnvelope,
 }: {
   onUnlock: (key: CryptoKey) => void;
+  owner: string;
+  verificationEnvelope?: Envelope;
 }) {
   const { locale } = usePreferences();
   const text = vaultMessages[locale];
+  const device = deviceMessages[locale];
+  const [deviceAvailable, setDeviceAvailable] = useState(false);
+  const [enableDevice, setEnableDevice] = useState(false);
+  const [deviceError, setDeviceError] = useState(false);
+  const lifetime = useRef<AbortController | null>(null);
+  useEffect(() => {
+    const controller = new AbortController();
+    lifetime.current = controller;
+    setDeviceAvailable(!!readDeviceVault(owner));
+    return () => controller.abort();
+  }, [owner]);
   const [recovery, setRecovery] = useState("");
   const [generated, setGenerated] = useState<CryptoKey | null>(null);
   const [acknowledged, setAcknowledged] = useState(false);
@@ -33,20 +60,56 @@ export function VaultUnlock({
   }
   async function unlock(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (pending) return;
+    setPending(true);
     setError(false);
+    setDeviceError(false);
     try {
       const key = await importVaultKey(recovery);
+      if (verificationEnvelope) await decryptSecret(key, verificationEnvelope);
+      if (enableDevice)
+        await enrollDeviceVault(owner, recovery, lifetime.current?.signal);
+      lifetime.current?.signal.throwIfAborted();
       setRecovery("");
       onUnlock(key);
     } catch {
-      setError(true);
+      if (enableDevice) setDeviceError(true);
+      else setError(true);
+    } finally {
+      setPending(false);
     }
   }
-  function confirm() {
-    if (!generated || !acknowledged) return;
-    onUnlock(generated);
-    setRecovery("");
-    setGenerated(null);
+  async function confirm() {
+    if (!generated || !acknowledged || pending) return;
+    setPending(true);
+    setDeviceError(false);
+    try {
+      if (enableDevice)
+        await enrollDeviceVault(owner, recovery, lifetime.current?.signal);
+      lifetime.current?.signal.throwIfAborted();
+      onUnlock(generated);
+      setRecovery("");
+      setGenerated(null);
+    } catch {
+      setDeviceError(true);
+    } finally {
+      setPending(false);
+    }
+  }
+  async function deviceUnlock() {
+    if (pending) return;
+    setPending(true);
+    setDeviceError(false);
+    try {
+      const key = await unlockDeviceVault(owner, lifetime.current?.signal);
+      if (verificationEnvelope) await decryptSecret(key, verificationEnvelope);
+      lifetime.current?.signal.throwIfAborted();
+      onUnlock(key);
+    } catch {
+      setDeviceError(true);
+    } finally {
+      setPending(false);
+    }
   }
   function exportKey() {
     const url = URL.createObjectURL(
@@ -69,6 +132,31 @@ export function VaultUnlock({
       <p className="subtext mt-4">
         {generated ? text.keyWarning : text.keyExists}
       </p>
+      <p className="mt-4 text-xs leading-6 text-secondary">{device.help}</p>
+      {deviceAvailable && !generated && (
+        <div className="mt-5 space-y-3">
+          <Button className="w-full" disabled={pending} onClick={deviceUnlock}>
+            <KeyRound size={16} />
+            {device.unlock}
+          </Button>
+          <Button
+            variant="ghost"
+            className="w-full"
+            disabled={pending}
+            onClick={() => {
+              forgetDeviceVault(owner);
+              setDeviceAvailable(false);
+            }}
+          >
+            {device.forget}
+          </Button>
+        </div>
+      )}
+      {deviceError && (
+        <p role="alert" className="mt-4 text-sm text-danger">
+          {device.failed}
+        </p>
+      )}
       <form onSubmit={unlock} className="mt-6 space-y-4">
         <label className="block">
           <span className="field-label">{text.recovery}</span>
@@ -101,6 +189,18 @@ export function VaultUnlock({
             {text.wrongKey}
           </p>
         )}
+        {!deviceAvailable && (
+          <label className="flex items-start gap-3 text-xs leading-6">
+            <input
+              type="checkbox"
+              className="mt-1.5"
+              checked={enableDevice}
+              disabled={pending}
+              onChange={(event) => setEnableDevice(event.target.checked)}
+            />
+            {device.enable}
+          </label>
+        )}
         {generated ? (
           <>
             <Button variant="secondary" className="w-full" onClick={exportKey}>
@@ -121,7 +221,7 @@ export function VaultUnlock({
             </label>
             <Button
               className="w-full"
-              disabled={!acknowledged}
+              disabled={!acknowledged || pending}
               onClick={confirm}
             >
               {text.open}
@@ -132,19 +232,21 @@ export function VaultUnlock({
             <Button
               type="submit"
               className="w-full"
-              disabled={!recovery.trim()}
+              disabled={!recovery.trim() || pending}
             >
               <KeyRound size={16} />
               {text.unlock}
             </Button>
-            <Button
-              variant="secondary"
-              className="w-full"
-              disabled={pending}
-              onClick={create}
-            >
-              {text.create}
-            </Button>
+            {!verificationEnvelope && (
+              <Button
+                variant="secondary"
+                className="w-full"
+                disabled={pending}
+                onClick={create}
+              >
+                {text.create}
+              </Button>
+            )}
           </>
         )}
       </form>

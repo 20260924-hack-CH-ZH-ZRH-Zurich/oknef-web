@@ -170,7 +170,7 @@ export function Drive({ user }: { user: User }) {
           {m.encryptedRecords} · {items.length}
         </h2>
         {!key ? (
-          <VaultUnlock onUnlock={setKey} />
+          <VaultUnlock owner={`${scope}:drive`} onUnlock={setKey} />
         ) : (
           <div className="mt-5 space-y-4">
             <p className="text-xs text-secondary">
