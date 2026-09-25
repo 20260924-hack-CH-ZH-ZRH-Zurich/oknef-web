@@ -22,6 +22,9 @@ const app = next({
 await app.prepare();
 handle = app.getRequestHandler();
 server.on("upgrade", (request, socket, head) => {
+  const extension =
+    !!config.extensionOrigin &&
+    request.headers.origin === config.extensionOrigin;
   let origin;
   try {
     origin = new URL(request.headers.origin || "");
@@ -31,8 +34,9 @@ server.on("upgrade", (request, socket, head) => {
   }
   if (
     request.url !== "/api/ws" ||
-    origin.origin !== config.publicOrigin ||
-    !["http:", "https:"].includes(origin.protocol)
+    (!extension &&
+      (origin.origin !== config.publicOrigin ||
+        !["http:", "https:"].includes(origin.protocol)))
   ) {
     socket.destroy();
     return;
@@ -48,7 +52,7 @@ server.on("upgrade", (request, socket, head) => {
         "sec-websocket-key": request.headers["sec-websocket-key"],
         "sec-websocket-version": "13",
         cookie: request.headers.cookie || "",
-        origin: request.headers.origin || "",
+        origin: config.publicOrigin,
       },
       timeout: 15000,
     },

@@ -1,6 +1,12 @@
 export function runtimeConfig() {
   const backend = process.env.OKNEF_BACKEND_URL;
   const publicOrigin = process.env.PUBLIC_ORIGIN;
+  const extensionOrigin = process.env.OKNEF_EXTENSION_ORIGIN || undefined;
+  if (
+    extensionOrigin &&
+    !/^chrome-extension:\/\/[a-p]{32}$/.test(extensionOrigin)
+  )
+    throw new Error("Invalid OKNEF_EXTENSION_ORIGIN");
   const port = Number(process.env.PORT);
   const hostname = process.env.HOSTNAME;
   if (
@@ -34,6 +40,7 @@ export function runtimeConfig() {
   return {
     backend: url,
     publicOrigin: origin.origin,
+    extensionOrigin,
     port,
     hostname,
     dev: process.env.NODE_ENV !== "production",

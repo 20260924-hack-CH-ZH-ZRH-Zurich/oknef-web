@@ -29,17 +29,41 @@ async function proxy(
   if (!isPermittedEndpoint(endpoint) || request.nextUrl.search)
     return Response.json({ error: "Unknown route" }, { status: 404 });
   try {
-    const { backend, publicOrigin } = serverConfig();
+    const { backend, publicOrigin, extensionOrigin } = serverConfig();
+    const requestedOrigin = request.headers.get("origin");
+    const extension = !!extensionOrigin && requestedOrigin === extensionOrigin;
     if (
-      !["GET", "HEAD"].includes(request.method) &&
-      request.headers.get("origin") !== publicOrigin
+      (requestedOrigin && requestedOrigin !== publicOrigin && !extension) ||
+      (!["GET", "HEAD"].includes(request.method) && !requestedOrigin)
     )
       return Response.json({ error: "Invalid origin" }, { status: 403 });
+    const corsHeaders: Record<string, string> =
+      extension && extensionOrigin
+        ? {
+            "Access-Control-Allow-Origin": extensionOrigin,
+            "Access-Control-Allow-Credentials": "true",
+            Vary: "Origin",
+          }
+        : {};
+    if (request.method === "OPTIONS")
+      return new Response(null, {
+        status: 204,
+        headers: {
+          ...corsHeaders,
+          "Access-Control-Allow-Methods":
+            "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type, X-Oknef-Locale",
+          "Cache-Control": "no-store",
+        },
+      });
     const headers = new Headers();
     for (const name of ["content-type", "cookie", "origin"]) {
       const value = request.headers.get(name);
       if (value) headers.set(name, value);
     }
+    // The gateway has checked the exact installed extension origin. Backend
+    // authorization still uses the user's HttpOnly session cookie.
+    if (extension) headers.set("origin", publicOrigin);
     if (endpoint === "voice/call" || endpoint === "voice/session") {
       const locale = request.headers.get("x-oknef-locale") ?? "en";
       if (!["en", "de", "es", "fr"].includes(locale))
@@ -61,6 +85,7 @@ async function proxy(
     const responseHeaders = new Headers({
       "Cache-Control": "no-store",
       "X-Content-Type-Options": "nosniff",
+      ...corsHeaders,
     });
     for (const name of ["content-type", "set-cookie", "retry-after"]) {
       const value = upstream.headers.get(name);
@@ -91,4 +116,5 @@ export {
   proxy as PUT,
   proxy as PATCH,
   proxy as DELETE,
+  proxy as OPTIONS,
 };
