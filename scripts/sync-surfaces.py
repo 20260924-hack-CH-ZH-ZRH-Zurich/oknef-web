@@ -10,10 +10,18 @@ for name in ("oknef-web-ui-chat", "oknef-web-ui-components", "oknef-web-ui-canva
     destination = source.parent / name
     manifest_path = destination / "source-manifest.json"
     manifest = json.loads(manifest_path.read_text())
+    obsolete = "src/features/chat/capture/ImagePreview.tsx"
+    if not (source / obsolete).exists() and (destination / obsolete).is_file():
+        (destination / obsolete).unlink()
     pending = [item["path"] for item in manifest["files"]]
-    pending += ["src/app/api/[...path]/route.limits.test.ts", "src/lib/mediaLifecycle.test.ts"]
+    pending += [
+        "extension-socket.test.ts", "websocketUpgrade.test.ts",
+        "src/app/api/[...path]/route.limits.test.ts", "src/lib/mediaLifecycle.test.ts",
+        "src/lib/apiRoutes.test.ts", "src/lib/requestLimits.test.ts",
+    ]
     if name.endswith("chat"):
         pending += [str(path.relative_to(source)) for path in (source / "src/features/chat").glob("*.ts*")]
+        pending += [str(path.relative_to(source)) for path in (source / "src/features/capture").glob("*.test.ts")]
     if name.endswith("canvas"):
         pending += ["src/features/product/Connections.tsx"]
     copied = set()
@@ -26,7 +34,7 @@ for name in ("oknef-web-ui-chat", "oknef-web-ui-components", "oknef-web-ui-canva
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(origin, target)
         copied.add(relative)
-        if origin.suffix not in (".ts", ".tsx"):
+        if origin.suffix not in (".ts", ".tsx", ".js", ".mjs"):
             continue
         for imported in re.findall(r'(?:from\s+|import\s*)["\']([^"\']+)["\']', origin.read_text()):
             if imported.startswith("@/"):
@@ -35,7 +43,10 @@ for name in ("oknef-web-ui-chat", "oknef-web-ui-components", "oknef-web-ui-canva
                 base = origin.parent / imported
             else:
                 continue
-            for candidate in [base, Path(f"{base}.ts"), Path(f"{base}.tsx"), base / "index.ts", base / "index.tsx"]:
+            suffixes = (".ts", ".tsx", ".js", ".mjs")
+            candidates = [base] + [Path(f"{base}{suffix}") for suffix in suffixes]
+            candidates += [base / f"index{suffix}" for suffix in suffixes]
+            for candidate in candidates:
                 if candidate.is_file():
                     pending.append(str(candidate.resolve().relative_to(source)))
                     break
