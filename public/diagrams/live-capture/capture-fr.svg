@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900" role="img" aria-labelledby="title desc" xml:lang="fr">
+<title id="title">Des éléments sélectionnés à un actif lié</title><desc id="desc">L’empreinte prouve la réception de ces octets. Elle ne prouve ni authenticité, identité, présence réelle ni absence de deepfake.</desc>
+<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0L9 4.5L0 9Z" fill="#bfee76"/></marker></defs>
+<rect width="1400" height="900" rx="28" fill="#16231b"/>
+<g font-family="Arial,Helvetica,sans-serif">
+<text x="52" y="52" fill="#bfee76" font-size="16" font-weight="700">OKNEF  /  FR  /  2026-09-25</text>
+
+<text x="52" y="108" fill="#f3f8f1" font-size="34" font-weight="700">Des éléments sélectionnés à un actif lié</text>
+
+<text x="52" y="147" fill="#bdcbbf" font-size="20" font-weight="400">Une action explicite à chaque étape · document, image, audio, vidéo ou QR</text>
+
+<path d="M440 282H495" fill="none" stroke="#bfee76" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M898 282H952" fill="none" stroke="#bfee76" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M1162 385V408" fill="none" stroke="#bfee76" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M953 518H912" fill="none" stroke="#bfee76" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M496 518H454" fill="none" stroke="#bfee76" stroke-width="3" marker-end="url(#arrow)"/>
+<g data-card="1"><rect x="52" y="190" width="380" height="193" rx="18" fill="#24392c" stroke="#55745a"/>
+<text x="74" y="221" fill="#bfee76" font-size="16" font-weight="700">01</text>
+
+<text x="74" y="255" fill="#f3f8f1" font-size="22" font-weight="700">Choisir ou capturer</text>
+
+<text x="74" y="286" fill="#d5e1da" font-size="18" font-weight="400">Choisir un fichier ou autoriser</text>
+<text x="74" y="310" fill="#d5e1da" font-size="18" font-weight="400">caméra / microphone. Examiner le</text>
+<text x="74" y="334" fill="#d5e1da" font-size="18" font-weight="400">contenu sélectionné.</text>
+
+</g>
+<g data-card="2"><rect x="510" y="190" width="380" height="193" rx="18" fill="#24392c" stroke="#55745a"/>
+<text x="532" y="221" fill="#bfee76" font-size="16" font-weight="700">02</text>
+
+<text x="532" y="255" fill="#f3f8f1" font-size="22" font-weight="700">Confirmer l’envoi</text>
+
+<text x="532" y="286" fill="#d5e1da" font-size="18" font-weight="400">Le consentement transmet les éléments</text>
+<text x="532" y="310" fill="#d5e1da" font-size="18" font-weight="400">à l’espace de travail. Le décodage QR</text>
+<text x="532" y="334" fill="#d5e1da" font-size="18" font-weight="400">reste local.</text>
+
+</g>
+<g data-card="3"><rect x="968" y="190" width="380" height="193" rx="18" fill="#24392c" stroke="#55745a"/>
+<text x="990" y="221" fill="#bfee76" font-size="16" font-weight="700">03</text>
+
+<text x="990" y="255" fill="#f3f8f1" font-size="22" font-weight="700">Recevoir les octets</text>
+
+<text x="990" y="286" fill="#d5e1da" font-size="18" font-weight="400">Le serveur calcule SHA-256 et la</text>
+<text x="990" y="310" fill="#d5e1da" font-size="18" font-weight="400">taille du média reçu. Il s’agit d’un</text>
+<text x="990" y="334" fill="#d5e1da" font-size="18" font-weight="400">reçu des octets.</text>
+
+</g>
+<g data-card="4"><rect x="968" y="423" width="380" height="193" rx="18" fill="#24392c" stroke="#55745a"/>
+<text x="990" y="454" fill="#bfee76" font-size="16" font-weight="700">04</text>
+
+<text x="990" y="488" fill="#f3f8f1" font-size="22" font-weight="700">Examiner avec le modèle</text>
+
+<text x="990" y="519" fill="#d5e1da" font-size="18" font-weight="400">AI Core demande une OCR ou des</text>
+<text x="990" y="543" fill="#d5e1da" font-size="18" font-weight="400">observations limitées. Les résultats</text>
+<text x="990" y="567" fill="#d5e1da" font-size="18" font-weight="400">peuvent être incomplets ou erronés.</text>
+
+</g>
+<g data-card="5"><rect x="510" y="423" width="380" height="193" rx="18" fill="#24392c" stroke="#55745a"/>
+<text x="532" y="454" fill="#bfee76" font-size="16" font-weight="700">05</text>
+
+<text x="532" y="488" fill="#f3f8f1" font-size="22" font-weight="700">Enregistrer la session</text>
+
+<text x="532" y="519" fill="#d5e1da" font-size="18" font-weight="400">Conserver méthode, empreinte,</text>
+<text x="532" y="543" fill="#d5e1da" font-size="18" font-weight="400">observations et limites sous les</text>
+<text x="532" y="567" fill="#d5e1da" font-size="18" font-weight="400">droits de l’espace de travail.</text>
+
+</g>
+<g data-card="6"><rect x="52" y="423" width="380" height="193" rx="18" fill="#24392c" stroke="#55745a"/>
+<text x="74" y="454" fill="#bfee76" font-size="16" font-weight="700">06</text>
+
+<text x="74" y="488" fill="#f3f8f1" font-size="22" font-weight="700">Confirmer l’actif</text>
+
+<text x="74" y="519" fill="#d5e1da" font-size="18" font-weight="400">Vérifier les champs extraits avant</text>
+<text x="74" y="543" fill="#d5e1da" font-size="18" font-weight="400">enregistrement. L’actif renvoie à sa</text>
+<text x="74" y="567" fill="#d5e1da" font-size="18" font-weight="400">session source.</text>
+
+</g>
+<rect x="52" y="650" width="1296" height="112" rx="18" fill="#31452b"/>
+<text x="75" y="684" fill="#d8f0b7" font-size="23" font-weight="700">L’original et le dossier ont des stockages distincts</text>
+
+<text x="75" y="718" fill="#e5eedf" font-size="20" font-weight="400">À l’enregistrement, le navigateur peut conserver l’original chiffré avec AES-256-GCM. Le serveur garde la session, pas le fichier</text>
+<text x="75" y="745" fill="#e5eedf" font-size="20" font-weight="400">multimédia original.</text>
+
+<text x="52" y="811" fill="#e8ce96" font-size="20" font-weight="400">L’empreinte prouve la réception de ces octets. Elle ne prouve ni authenticité, identité, présence réelle ni absence de</text>
+<text x="52" y="840" fill="#e8ce96" font-size="20" font-weight="400">deepfake.</text>
+
+</g></svg>

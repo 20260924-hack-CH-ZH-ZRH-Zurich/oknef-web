@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900" role="img" aria-labelledby="title desc" xml:lang="es">
+<title id="title">Desbloqueo local con ayuda del autenticador</title><desc id="desc">La cámara nunca desbloquea la bóveda. Oknef no reconoce rostros ni prueba identidad; no hay auditoría independiente ni protección del dispositivo comprometido.</desc>
+<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0L9 4.5L0 9Z" fill="#bfee76"/></marker></defs>
+<rect width="1400" height="900" rx="28" fill="#16231b"/>
+<g font-family="Arial,Helvetica,sans-serif">
+<text x="52" y="52" fill="#bfee76" font-size="16" font-weight="700">OKNEF  /  ES  /  2026-09-25</text>
+
+<text x="52" y="108" fill="#f3f8f1" font-size="34" font-weight="700">Desbloqueo local con ayuda del autenticador</text>
+
+<text x="52" y="147" fill="#bdcbbf" font-size="20" font-weight="400">Protección opcional con WebAuthn PRF · requiere un autenticador compatible y un origen HTTPS</text>
+
+<path d="M440 282H495" fill="none" stroke="#bfee76" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M898 282H952" fill="none" stroke="#bfee76" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M1162 385V408" fill="none" stroke="#bfee76" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M953 518H912" fill="none" stroke="#bfee76" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M496 518H454" fill="none" stroke="#bfee76" stroke-width="3" marker-end="url(#arrow)"/>
+<g data-card="1"><rect x="52" y="190" width="380" height="193" rx="18" fill="#24392c" stroke="#55745a"/>
+<text x="74" y="221" fill="#bfee76" font-size="16" font-weight="700">01</text>
+
+<text x="74" y="255" fill="#f3f8f1" font-size="22" font-weight="700">Verificar en el autenticador</text>
+
+<text x="74" y="286" fill="#d5e1da" font-size="18" font-weight="400">El navegador exige verificación: un</text>
+<text x="74" y="310" fill="#d5e1da" font-size="18" font-weight="400">PIN del dispositivo o biometría</text>
+<text x="74" y="334" fill="#d5e1da" font-size="18" font-weight="400">admitida por el autenticador.</text>
+
+</g>
+<g data-card="2"><rect x="510" y="190" width="380" height="193" rx="18" fill="#24392c" stroke="#55745a"/>
+<text x="532" y="221" fill="#bfee76" font-size="16" font-weight="700">02</text>
+
+<text x="532" y="255" fill="#f3f8f1" font-size="22" font-weight="700">Evaluar WebAuthn PRF</text>
+
+<text x="532" y="286" fill="#d5e1da" font-size="18" font-weight="400">La credencial elegida genera 32</text>
+<text x="532" y="310" fill="#d5e1da" font-size="18" font-weight="400">bytes. Si PRF no está disponible, se</text>
+<text x="532" y="334" fill="#d5e1da" font-size="18" font-weight="400">detiene el registro.</text>
+
+</g>
+<g data-card="3"><rect x="968" y="190" width="380" height="193" rx="18" fill="#24392c" stroke="#55745a"/>
+<text x="990" y="221" fill="#bfee76" font-size="16" font-weight="700">03</text>
+
+<text x="990" y="255" fill="#f3f8f1" font-size="22" font-weight="700">Derivar la clave de protección</text>
+
+<text x="990" y="286" fill="#d5e1da" font-size="18" font-weight="400">HKDF-SHA-256 combina PRF, una sal</text>
+<text x="990" y="310" fill="#d5e1da" font-size="18" font-weight="400">aleatoria y un contexto específico de</text>
+<text x="990" y="334" fill="#d5e1da" font-size="18" font-weight="400">la aplicación.</text>
+
+</g>
+<g data-card="4"><rect x="968" y="423" width="380" height="193" rx="18" fill="#24392c" stroke="#55745a"/>
+<text x="990" y="454" fill="#bfee76" font-size="16" font-weight="700">04</text>
+
+<text x="990" y="488" fill="#f3f8f1" font-size="22" font-weight="700">Proteger con AES-256-GCM</text>
+
+<text x="990" y="519" fill="#d5e1da" font-size="18" font-weight="400">Cifra la clave de recuperación. Los</text>
+<text x="990" y="543" fill="#d5e1da" font-size="18" font-weight="400">datos asociados vinculan el registro</text>
+<text x="990" y="567" fill="#d5e1da" font-size="18" font-weight="400">al propietario y al origen.</text>
+
+</g>
+<g data-card="5"><rect x="510" y="423" width="380" height="193" rx="18" fill="#24392c" stroke="#55745a"/>
+<text x="532" y="454" fill="#bfee76" font-size="16" font-weight="700">05</text>
+
+<text x="532" y="488" fill="#f3f8f1" font-size="22" font-weight="700">Guardar el registro cifrado</text>
+
+<text x="532" y="519" fill="#d5e1da" font-size="18" font-weight="400">Conserva ID de credencial, sal, IV y</text>
+<text x="532" y="543" fill="#d5e1da" font-size="18" font-weight="400">texto cifrado en este navegador, sin</text>
+<text x="532" y="567" fill="#d5e1da" font-size="18" font-weight="400">clave de recuperación en claro.</text>
+
+</g>
+<g data-card="6"><rect x="52" y="423" width="380" height="193" rx="18" fill="#24392c" stroke="#55745a"/>
+<text x="74" y="454" fill="#bfee76" font-size="16" font-weight="700">06</text>
+
+<text x="74" y="488" fill="#f3f8f1" font-size="22" font-weight="700">Desbloquear con la credencial</text>
+
+<text x="74" y="519" fill="#d5e1da" font-size="18" font-weight="400">Repite la verificación y PRF,</text>
+<text x="74" y="543" fill="#d5e1da" font-size="18" font-weight="400">descifra localmente e importa la</text>
+<text x="74" y="567" fill="#d5e1da" font-size="18" font-weight="400">clave en la memoria del navegador.</text>
+
+</g>
+<rect x="52" y="650" width="1296" height="112" rx="18" fill="#31452b"/>
+<text x="75" y="684" fill="#d8f0b7" font-size="23" font-weight="700">Recuperación separada · el titular guarda una copia de la clave</text>
+
+<text x="75" y="718" fill="#e5eedf" font-size="20" font-weight="400">Las entradas usan AES-256-GCM con la clave de la bóveda. Perder el navegador o el autenticador puede exigir la clave de</text>
+<text x="75" y="745" fill="#e5eedf" font-size="20" font-weight="400">recuperación guardada aparte.</text>
+
+<text x="52" y="811" fill="#e8ce96" font-size="20" font-weight="400">La cámara nunca desbloquea la bóveda. Oknef no reconoce rostros ni prueba identidad; no hay auditoría independiente ni</text>
+<text x="52" y="840" fill="#e8ce96" font-size="20" font-weight="400">protección del dispositivo comprometido.</text>
+
+</g></svg>

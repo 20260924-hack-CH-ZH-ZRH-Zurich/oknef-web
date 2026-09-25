@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900" role="img" aria-labelledby="title desc" xml:lang="en">
+<title id="title">From selected evidence to a linked asset</title><desc id="desc">A digest proves receipt of these bytes. It proves neither an authentic source nor identity, liveness or the absence of a deepfake.</desc>
+<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0L9 4.5L0 9Z" fill="#bfee76"/></marker></defs>
+<rect width="1400" height="900" rx="28" fill="#16231b"/>
+<g font-family="Arial,Helvetica,sans-serif">
+<text x="52" y="52" fill="#bfee76" font-size="16" font-weight="700">OKNEF  /  EN  /  2026-09-25</text>
+
+<text x="52" y="108" fill="#f3f8f1" font-size="34" font-weight="700">From selected evidence to a linked asset</text>
+
+<text x="52" y="147" fill="#bdcbbf" font-size="20" font-weight="400">An explicit action at each boundary · document, image, audio, video or QR</text>
+
+<path d="M440 282H495" fill="none" stroke="#bfee76" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M898 282H952" fill="none" stroke="#bfee76" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M1162 385V408" fill="none" stroke="#bfee76" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M953 518H912" fill="none" stroke="#bfee76" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M496 518H454" fill="none" stroke="#bfee76" stroke-width="3" marker-end="url(#arrow)"/>
+<g data-card="1"><rect x="52" y="190" width="380" height="193" rx="18" fill="#24392c" stroke="#55745a"/>
+<text x="74" y="221" fill="#bfee76" font-size="16" font-weight="700">01</text>
+
+<text x="74" y="255" fill="#f3f8f1" font-size="22" font-weight="700">Select or capture</text>
+
+<text x="74" y="286" fill="#d5e1da" font-size="18" font-weight="400">Use a file or grant camera /</text>
+<text x="74" y="310" fill="#d5e1da" font-size="18" font-weight="400">microphone permission. Review the</text>
+<text x="74" y="334" fill="#d5e1da" font-size="18" font-weight="400">selected content.</text>
+
+</g>
+<g data-card="2"><rect x="510" y="190" width="380" height="193" rx="18" fill="#24392c" stroke="#55745a"/>
+<text x="532" y="221" fill="#bfee76" font-size="16" font-weight="700">02</text>
+
+<text x="532" y="255" fill="#f3f8f1" font-size="22" font-weight="700">Choose to submit</text>
+
+<text x="532" y="286" fill="#d5e1da" font-size="18" font-weight="400">Consent sends the selected evidence</text>
+<text x="532" y="310" fill="#d5e1da" font-size="18" font-weight="400">to the workspace. QR decoding stays</text>
+<text x="532" y="334" fill="#d5e1da" font-size="18" font-weight="400">local.</text>
+
+</g>
+<g data-card="3"><rect x="968" y="190" width="380" height="193" rx="18" fill="#24392c" stroke="#55745a"/>
+<text x="990" y="221" fill="#bfee76" font-size="16" font-weight="700">03</text>
+
+<text x="990" y="255" fill="#f3f8f1" font-size="22" font-weight="700">Receive the bytes</text>
+
+<text x="990" y="286" fill="#d5e1da" font-size="18" font-weight="400">The server computes SHA-256 and size</text>
+<text x="990" y="310" fill="#d5e1da" font-size="18" font-weight="400">from the received media. This is a</text>
+<text x="990" y="334" fill="#d5e1da" font-size="18" font-weight="400">byte receipt.</text>
+
+</g>
+<g data-card="4"><rect x="968" y="423" width="380" height="193" rx="18" fill="#24392c" stroke="#55745a"/>
+<text x="990" y="454" fill="#bfee76" font-size="16" font-weight="700">04</text>
+
+<text x="990" y="488" fill="#f3f8f1" font-size="22" font-weight="700">Review with the model</text>
+
+<text x="990" y="519" fill="#d5e1da" font-size="18" font-weight="400">AI Core requests bounded OCR or media</text>
+<text x="990" y="543" fill="#d5e1da" font-size="18" font-weight="400">observations. Findings may be</text>
+<text x="990" y="567" fill="#d5e1da" font-size="18" font-weight="400">incomplete or wrong.</text>
+
+</g>
+<g data-card="5"><rect x="510" y="423" width="380" height="193" rx="18" fill="#24392c" stroke="#55745a"/>
+<text x="532" y="454" fill="#bfee76" font-size="16" font-weight="700">05</text>
+
+<text x="532" y="488" fill="#f3f8f1" font-size="22" font-weight="700">Save the evidence session</text>
+
+<text x="532" y="519" fill="#d5e1da" font-size="18" font-weight="400">Preserve the method, digest,</text>
+<text x="532" y="543" fill="#d5e1da" font-size="18" font-weight="400">observations and limitations under</text>
+<text x="532" y="567" fill="#d5e1da" font-size="18" font-weight="400">workspace authorization.</text>
+
+</g>
+<g data-card="6"><rect x="52" y="423" width="380" height="193" rx="18" fill="#24392c" stroke="#55745a"/>
+<text x="74" y="454" fill="#bfee76" font-size="16" font-weight="700">06</text>
+
+<text x="74" y="488" fill="#f3f8f1" font-size="22" font-weight="700">Confirm an inventory asset</text>
+
+<text x="74" y="519" fill="#d5e1da" font-size="18" font-weight="400">Review extracted fields before</text>
+<text x="74" y="543" fill="#d5e1da" font-size="18" font-weight="400">saving. The asset links back to its</text>
+<text x="74" y="567" fill="#d5e1da" font-size="18" font-weight="400">source session.</text>
+
+</g>
+<rect x="52" y="650" width="1296" height="112" rx="18" fill="#31452b"/>
+<text x="75" y="684" fill="#d8f0b7" font-size="23" font-weight="700">Original and record have separate storage boundaries</text>
+
+<text x="75" y="718" fill="#e5eedf" font-size="20" font-weight="400">When saved, the browser can retain the original encrypted with AES-256-GCM. The server stores the session record, not the</text>
+<text x="75" y="745" fill="#e5eedf" font-size="20" font-weight="400">original media file.</text>
+
+<text x="52" y="811" fill="#e8ce96" font-size="20" font-weight="400">A digest proves receipt of these bytes. It proves neither an authentic source nor identity, liveness or the absence of a</text>
+<text x="52" y="840" fill="#e8ce96" font-size="20" font-weight="400">deepfake.</text>
+
+</g></svg>

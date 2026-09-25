@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900" role="img" aria-labelledby="title desc" xml:lang="de">
+<title id="title">Von ausgewählten Belegen zum verknüpften Eintrag</title><desc id="desc">Der Hashwert belegt den Empfang dieser Bytes. Er belegt weder Echtheit, Identität, Lebendigkeit noch die Abwesenheit eines Deepfakes.</desc>
+<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0L9 4.5L0 9Z" fill="#bfee76"/></marker></defs>
+<rect width="1400" height="900" rx="28" fill="#16231b"/>
+<g font-family="Arial,Helvetica,sans-serif">
+<text x="52" y="52" fill="#bfee76" font-size="16" font-weight="700">OKNEF  /  DE  /  2026-09-25</text>
+
+<text x="52" y="108" fill="#f3f8f1" font-size="34" font-weight="700">Von ausgewählten Belegen zum verknüpften Eintrag</text>
+
+<text x="52" y="147" fill="#bdcbbf" font-size="20" font-weight="400">Jeder Schritt ist bewusst · Dokument, Bild, Audio, Video oder QR</text>
+
+<path d="M440 282H495" fill="none" stroke="#bfee76" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M898 282H952" fill="none" stroke="#bfee76" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M1162 385V408" fill="none" stroke="#bfee76" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M953 518H912" fill="none" stroke="#bfee76" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M496 518H454" fill="none" stroke="#bfee76" stroke-width="3" marker-end="url(#arrow)"/>
+<g data-card="1"><rect x="52" y="190" width="380" height="193" rx="18" fill="#24392c" stroke="#55745a"/>
+<text x="74" y="221" fill="#bfee76" font-size="16" font-weight="700">01</text>
+
+<text x="74" y="255" fill="#f3f8f1" font-size="22" font-weight="700">Auswählen oder aufnehmen</text>
+
+<text x="74" y="286" fill="#d5e1da" font-size="18" font-weight="400">Datei wählen oder Kamera / Mikrofon</text>
+<text x="74" y="310" fill="#d5e1da" font-size="18" font-weight="400">erlauben. Den ausgewählten Inhalt</text>
+<text x="74" y="334" fill="#d5e1da" font-size="18" font-weight="400">prüfen.</text>
+
+</g>
+<g data-card="2"><rect x="510" y="190" width="380" height="193" rx="18" fill="#24392c" stroke="#55745a"/>
+<text x="532" y="221" fill="#bfee76" font-size="16" font-weight="700">02</text>
+
+<text x="532" y="255" fill="#f3f8f1" font-size="22" font-weight="700">Übermittlung bestätigen</text>
+
+<text x="532" y="286" fill="#d5e1da" font-size="18" font-weight="400">Die Einwilligung sendet Belege an den</text>
+<text x="532" y="310" fill="#d5e1da" font-size="18" font-weight="400">Arbeitsbereich. QR wird lokal</text>
+<text x="532" y="334" fill="#d5e1da" font-size="18" font-weight="400">dekodiert.</text>
+
+</g>
+<g data-card="3"><rect x="968" y="190" width="380" height="193" rx="18" fill="#24392c" stroke="#55745a"/>
+<text x="990" y="221" fill="#bfee76" font-size="16" font-weight="700">03</text>
+
+<text x="990" y="255" fill="#f3f8f1" font-size="22" font-weight="700">Bytes empfangen</text>
+
+<text x="990" y="286" fill="#d5e1da" font-size="18" font-weight="400">Der Server berechnet SHA-256 und</text>
+<text x="990" y="310" fill="#d5e1da" font-size="18" font-weight="400">Größe aus den empfangenen Medien:</text>
+<text x="990" y="334" fill="#d5e1da" font-size="18" font-weight="400">eine Empfangsbestätigung.</text>
+
+</g>
+<g data-card="4"><rect x="968" y="423" width="380" height="193" rx="18" fill="#24392c" stroke="#55745a"/>
+<text x="990" y="454" fill="#bfee76" font-size="16" font-weight="700">04</text>
+
+<text x="990" y="488" fill="#f3f8f1" font-size="22" font-weight="700">Mit dem Modell prüfen</text>
+
+<text x="990" y="519" fill="#d5e1da" font-size="18" font-weight="400">AI Core fordert begrenzte OCR oder</text>
+<text x="990" y="543" fill="#d5e1da" font-size="18" font-weight="400">Medienbeobachtungen an. Ergebnisse</text>
+<text x="990" y="567" fill="#d5e1da" font-size="18" font-weight="400">können lückenhaft oder falsch sein.</text>
+
+</g>
+<g data-card="5"><rect x="510" y="423" width="380" height="193" rx="18" fill="#24392c" stroke="#55745a"/>
+<text x="532" y="454" fill="#bfee76" font-size="16" font-weight="700">05</text>
+
+<text x="532" y="488" fill="#f3f8f1" font-size="22" font-weight="700">Nachweissitzung speichern</text>
+
+<text x="532" y="519" fill="#d5e1da" font-size="18" font-weight="400">Methode, Hashwert, Beobachtungen und</text>
+<text x="532" y="543" fill="#d5e1da" font-size="18" font-weight="400">Grenzen bleiben im autorisierten</text>
+<text x="532" y="567" fill="#d5e1da" font-size="18" font-weight="400">Arbeitsbereich.</text>
+
+</g>
+<g data-card="6"><rect x="52" y="423" width="380" height="193" rx="18" fill="#24392c" stroke="#55745a"/>
+<text x="74" y="454" fill="#bfee76" font-size="16" font-weight="700">06</text>
+
+<text x="74" y="488" fill="#f3f8f1" font-size="22" font-weight="700">Inventareintrag bestätigen</text>
+
+<text x="74" y="519" fill="#d5e1da" font-size="18" font-weight="400">Extrahierte Felder vor dem Speichern</text>
+<text x="74" y="543" fill="#d5e1da" font-size="18" font-weight="400">prüfen. Der Eintrag verweist auf</text>
+<text x="74" y="567" fill="#d5e1da" font-size="18" font-weight="400">seine Quellsitzung.</text>
+
+</g>
+<rect x="52" y="650" width="1296" height="112" rx="18" fill="#31452b"/>
+<text x="75" y="684" fill="#d8f0b7" font-size="23" font-weight="700">Original und Datensatz werden getrennt gespeichert</text>
+
+<text x="75" y="718" fill="#e5eedf" font-size="20" font-weight="400">Beim Speichern kann der Browser das Original mit AES-256-GCM verschlüsselt behalten. Der Server speichert die Sitzung, nicht die</text>
+<text x="75" y="745" fill="#e5eedf" font-size="20" font-weight="400">ursprüngliche Mediendatei.</text>
+
+<text x="52" y="811" fill="#e8ce96" font-size="20" font-weight="400">Der Hashwert belegt den Empfang dieser Bytes. Er belegt weder Echtheit, Identität, Lebendigkeit noch die Abwesenheit eines</text>
+<text x="52" y="840" fill="#e8ce96" font-size="20" font-weight="400">Deepfakes.</text>
+
+</g></svg>

@@ -2,12 +2,22 @@ import Image from "next/image";
 import { useState } from "react";
 import { usePreferences } from "@/features/preferences/Preferences";
 import { AgentCatalog } from "@/features/security/AgentCatalog";
+import { liveCaptureLabels } from "./liveCaptureLabels";
 import { useProductMessages } from "./messages";
 export function PlatformLab() {
   const m = useProductMessages();
   const { locale } = usePreferences();
+  const captureLabels = liveCaptureLabels[locale];
   const [tab, setTab] = useState("diagrams");
   const diagrams = [
+    {
+      name: captureLabels.capture,
+      src: `/diagrams/live-capture/capture-${locale}.svg`,
+    },
+    {
+      name: captureLabels.vault,
+      src: `/diagrams/live-capture/vault-${locale}.svg`,
+    },
     { name: m.drive, src: `/guides/encryption-${locale}.svg` },
     { name: m.topology, src: `/guides/topology-${locale}.svg` },
     { name: m.company, src: `/guides/tenants-${locale}.svg` },

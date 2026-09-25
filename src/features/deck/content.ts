@@ -5,6 +5,7 @@ import { es } from "./content/es";
 import { fr } from "./content/fr";
 import { expansionSlides } from "./expansion";
 import { guideSlides } from "./guides";
+import { liveCaptureSlides } from "./liveCapture";
 import { resourceSlides } from "./resources";
 import type { Slide } from "./types";
 
@@ -12,6 +13,7 @@ function withExpansion(locale: Locale, original: Slide[]): Slide[] {
   return [
     ...original.slice(0, 4),
     ...expansionSlides(locale),
+    ...liveCaptureSlides(locale),
     ...guideSlides(locale),
     ...original.slice(4),
     ...resourceSlides(locale),
