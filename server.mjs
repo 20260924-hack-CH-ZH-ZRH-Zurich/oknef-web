@@ -3,6 +3,7 @@ import { request as httpsRequest } from "node:https";
 import next from "next";
 import { extensionSocketGateway } from "./extension-socket.mjs";
 import { runtimeConfig } from "./runtime-config.mjs";
+import { websocketUpgrade } from "./websocketUpgrade.mjs";
 
 const config = runtimeConfig();
 const extensionSockets = extensionSocketGateway(config);
@@ -26,7 +27,7 @@ const app = next({
 });
 await app.prepare();
 handle = app.getRequestHandler();
-server.on("upgrade", (request, socket, head) => {
+const handleUpgrade = websocketUpgrade((request, socket, head) => {
   const extension =
     !!config.extensionOrigin &&
     request.headers.origin === config.extensionOrigin;
@@ -74,6 +75,7 @@ server.on("upgrade", (request, socket, head) => {
   );
   forward.on("upgrade", (response, upstream, upstreamHead) => {
     if (
+      socket.destroyed ||
       response.statusCode !== 101 ||
       !response.headers["sec-websocket-accept"]
     ) {
@@ -100,7 +102,9 @@ server.on("upgrade", (request, socket, head) => {
   });
   forward.on("error", () => socket.destroy());
   forward.end();
+  return forward;
 });
+server.on("upgrade", handleUpgrade);
 server.listen(config.port, config.hostname, () =>
   console.info("Oknef web ready"),
 );
