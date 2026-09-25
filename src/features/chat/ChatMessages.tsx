@@ -8,9 +8,9 @@ import {
 import { useEffect, useRef } from "react";
 import { GeneratedCards } from "@/components/ui/data-display/GeneratedCards/GeneratedCards";
 import { usePreferences } from "@/features/preferences/Preferences";
+import type { Message } from "./conversation";
 import { DocumentResult } from "./DocumentResult";
 import { documentText } from "./documents";
-import type { Message } from "./useConversation";
 import { WorkflowResult } from "./WorkflowResult";
 import { workflowText } from "./workflows";
 export function ChatMessages({

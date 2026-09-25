@@ -162,7 +162,7 @@ export function Composer({
             </output>
           )}
           <select
-            disabled={Boolean(workflow)}
+            disabled={Boolean(workflow) || (voiceState !== "off" && !imageMode)}
             aria-label={t("model")}
             title={t("model")}
             value={model}

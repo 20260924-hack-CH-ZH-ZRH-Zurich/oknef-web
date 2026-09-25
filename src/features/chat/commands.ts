@@ -1,3 +1,4 @@
+import { type Workflow, workflowSchema } from "./workflows";
 export const miniAppNames = [
   "qr",
   "link",
@@ -61,16 +62,56 @@ export function parseCommand(input: string): ChatCommand {
 }
 export type VoiceAction =
   | { name: "open_miniapp"; arguments: { kind: MiniAppName } }
-  | { name: "navigate_workspace"; arguments: { view: string } };
+  | { name: "navigate_workspace"; arguments: { view: string } }
+  | {
+      name: "read_workspace";
+      arguments: {
+        reference: "assets" | "sessions" | "integrations" | "workspace";
+      };
+    }
+  | {
+      name: "run_advisory_workflow";
+      arguments: { workflow: Workflow; message: string };
+    };
 export function parseVoiceAction(
   name: unknown,
   input: unknown,
 ): VoiceAction | null {
-  if (typeof input !== "string" || input.length > 1000) return null;
+  if (typeof input !== "string" || input.length > 7000) return null;
   try {
     const args: unknown = JSON.parse(input);
     if (!args || typeof args !== "object" || Array.isArray(args)) return null;
     const value = args as Record<string, unknown>;
+    if (
+      name === "read_workspace" &&
+      Object.keys(value).length === 1 &&
+      ["assets", "sessions", "integrations", "workspace"].includes(
+        String(value.reference),
+      )
+    )
+      return {
+        name,
+        arguments: {
+          reference: value.reference as
+            | "assets"
+            | "sessions"
+            | "integrations"
+            | "workspace",
+        },
+      };
+    const workflow = workflowSchema.shape.workflow.safeParse(value.workflow);
+    if (
+      name === "run_advisory_workflow" &&
+      Object.keys(value).length === 2 &&
+      workflow.success &&
+      typeof value.message === "string" &&
+      value.message.trim() &&
+      value.message.length <= 5000
+    )
+      return {
+        name,
+        arguments: { workflow: workflow.data, message: value.message },
+      };
     if (
       name === "open_miniapp" &&
       Object.keys(value).length === 1 &&

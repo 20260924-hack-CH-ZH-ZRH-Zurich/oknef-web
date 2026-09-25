@@ -1,43 +1,46 @@
-import { parseVoiceAction, type VoiceAction } from "./commands";
+import {
+  type VoiceActionHandler,
+  type VoiceActivity,
+  type VoiceMessage,
+  voiceEvents,
+} from "./voiceEvents";
+
+export { startDictation } from "./dictation";
 export type VoiceHandle = {
   close: () => void;
   setMuted: (muted: boolean) => void;
+  sendText: (content: string) => boolean;
+  addContext: (content: string) => boolean;
 };
 export async function startVoice(
   locale: string,
   onText: (role: "user" | "assistant", text: string) => void,
   onEnded: () => void,
   signal: AbortSignal,
-  onAction?: (action: VoiceAction) => void,
+  onAction?: VoiceActionHandler,
+  options: {
+    history?: readonly VoiceMessage[];
+    onActivity?: (activity: VoiceActivity) => void;
+  } = {},
 ): Promise<VoiceHandle> {
+  signal.throwIfAborted();
   const peer = new RTCPeerConnection();
   const audio = document.createElement("audio");
   audio.autoplay = true;
+  audio.setAttribute("playsinline", "");
   audio.hidden = true;
   document.body.appendChild(audio);
-  let stream: MediaStream;
-  try {
-    stream = await navigator.mediaDevices.getUserMedia({
-      audio: {
-        echoCancellation: true,
-        noiseSuppression: true,
-        autoGainControl: true,
-      },
-      video: false,
-    });
-  } catch (error) {
-    peer.close();
-    audio.remove();
-    throw error;
-  }
+  let stream: MediaStream | undefined;
   let closed = false;
   let disconnectTimer: ReturnType<typeof setTimeout> | undefined;
+  const session = new AbortController();
   const close = () => {
     if (closed) return;
     closed = true;
+    session.abort();
     clearTimeout(disconnectTimer);
     signal.removeEventListener("abort", close);
-    stream.getTracks().forEach((track) => {
+    stream?.getTracks().forEach((track) => {
       track.stop();
     });
     peer.close();
@@ -45,94 +48,47 @@ export async function startVoice(
     audio.srcObject = null;
     audio.remove();
   };
+  const fail = () => {
+    if (!closed) {
+      close();
+      onEnded();
+    }
+  };
   signal.addEventListener("abort", close, { once: true });
   try {
+    stream = await captureMicrophone(session.signal);
     signal.throwIfAborted();
     stream.getTracks().forEach((track) => {
-      peer.addTrack(track, stream);
+      // Capture starts only after the provider session and event channel are ready.
+      track.enabled = false;
+      track.addEventListener("ended", fail, { once: true });
+      peer.addTrack(track, stream as MediaStream);
     });
     peer.ontrack = (event) => {
-      audio.srcObject = event.streams[0];
-      audio.play().catch(() => {
-        if (!closed) {
-          close();
-          onEnded();
-        }
-      });
+      audio.srcObject = event.streams[0] ?? new MediaStream([event.track]);
+      audio.play().catch(fail);
     };
     const channel = peer.createDataChannel("oai-events");
-    channel.onerror = () => {
-      if (!closed) {
-        close();
-        onEnded();
-      }
-    };
-    channel.onclose = () => {
-      if (!closed) {
-        close();
-        onEnded();
-      }
-    };
-    channel.onmessage = (event) => {
-      if (closed || signal.aborted) return;
-      try {
-        const value: unknown = JSON.parse(event.data);
-        if (!value || typeof value !== "object") return;
-        const message = value as Record<string, unknown>;
-        if (message.type === "response.function_call_arguments.done") {
-          const action = parseVoiceAction(message.name, message.arguments);
-          if (action) onAction?.(action);
-          if (
-            typeof message.call_id === "string" &&
-            channel.readyState === "open"
-          ) {
-            channel.send(
-              JSON.stringify({
-                type: "conversation.item.create",
-                item: {
-                  type: "function_call_output",
-                  call_id: message.call_id,
-                  output: JSON.stringify({
-                    opened: Boolean(action && onAction),
-                    submitted: false,
-                  }),
-                },
-              }),
-            );
-            channel.send(JSON.stringify({ type: "response.create" }));
-          }
-        }
-        if (
-          typeof message.transcript === "string" &&
-          [
-            "conversation.item.input_audio_transcription.completed",
-            "response.output_audio_transcript.done",
-            "response.audio_transcript.done",
-          ].includes(String(message.type))
-        )
-          onText(
-            message.type ===
-              "conversation.item.input_audio_transcription.completed"
-              ? "user"
-              : "assistant",
-            message.transcript.slice(0, 30000),
-          );
-      } catch {
-        console.warn("Invalid voice event ignored");
-      }
-    };
+    let sessionReady = false;
+    const events = voiceEvents(channel, {
+      onText,
+      onAction,
+      onActivity: options.onActivity,
+      onReady: () => {
+        sessionReady = true;
+      },
+      onError: fail,
+      signal: session.signal,
+    });
+    channel.onerror = fail;
+    channel.onclose = fail;
+    channel.onmessage = (event) => events.receive(event.data);
     peer.onconnectionstatechange = () => {
       clearTimeout(disconnectTimer);
       if (closed) return;
-      if (peer.connectionState === "failed") {
-        close();
-        onEnded();
-      }
+      if (peer.connectionState === "failed") fail();
       if (peer.connectionState === "disconnected")
-        disconnectTimer = setTimeout(() => {
-          close();
-          onEnded();
-        }, 8000);
+        disconnectTimer = setTimeout(fail, 8000);
     };
     const offer = await peer.createOffer();
     await peer.setLocalDescription(offer);
@@ -141,106 +97,100 @@ export async function startVoice(
       headers: { "Content-Type": "application/sdp", "x-oknef-locale": locale },
       body: offer.sdp,
       credentials: "same-origin",
-      signal: AbortSignal.any([signal, AbortSignal.timeout(30000)]),
+      signal: AbortSignal.any([session.signal, AbortSignal.timeout(30000)]),
     });
     if (!response.ok) throw new Error("callFailed");
     const answer = await response.text();
     if (!answer.startsWith("v=0") || answer.length > 100000)
       throw new Error("callFailed");
     await peer.setRemoteDescription({ type: "answer", sdp: answer });
-    await waitForConnection(peer, signal);
+    await waitForConnection(peer, channel, () => sessionReady, session.signal);
+    events.restore(options.history ?? []);
+    stream.getAudioTracks().forEach((track) => {
+      track.enabled = true;
+    });
+    options.onActivity?.("listening");
     return {
       close,
-      setMuted: (muted) => {
-        stream.getAudioTracks().forEach((track) => {
+      sendText: events.sendText,
+      addContext: events.addContext,
+      setMuted: (muted) =>
+        stream?.getAudioTracks().forEach((track) => {
           track.enabled = !muted;
-        });
-      },
+        }),
     };
   } catch (error) {
     close();
     throw error;
   }
 }
-function waitForConnection(peer: RTCPeerConnection, signal: AbortSignal) {
+
+function captureMicrophone(signal: AbortSignal): Promise<MediaStream> {
+  return new Promise((resolve, reject) => {
+    const abort = () =>
+      reject(new DOMException("Voice cancelled", "AbortError"));
+    if (signal.aborted) {
+      abort();
+      return;
+    }
+    signal.addEventListener("abort", abort, { once: true });
+    navigator.mediaDevices
+      .getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
+        video: false,
+      })
+      .then(
+        (stream) => {
+          signal.removeEventListener("abort", abort);
+          if (signal.aborted)
+            stream.getTracks().forEach((track) => {
+              track.stop();
+            });
+          else resolve(stream);
+        },
+        (error: unknown) => {
+          signal.removeEventListener("abort", abort);
+          reject(error);
+        },
+      );
+  });
+}
+function waitForConnection(
+  peer: RTCPeerConnection,
+  channel: RTCDataChannel,
+  sessionReady: () => boolean,
+  signal: AbortSignal,
+) {
   return new Promise<void>((resolve, reject) => {
     const finish = (error?: Error) => {
       clearTimeout(timer);
-      peer.removeEventListener("connectionstatechange", check);
+      clearInterval(poll);
       signal.removeEventListener("abort", abort);
       if (error) reject(error);
       else resolve();
     };
     const check = () => {
-      if (peer.connectionState === "connected") finish();
-      else if (["failed", "closed"].includes(peer.connectionState))
+      if (
+        peer.connectionState === "connected" &&
+        channel.readyState === "open" &&
+        sessionReady()
+      )
+        finish();
+      else if (
+        ["failed", "closed"].includes(peer.connectionState) ||
+        channel.readyState === "closed"
+      )
         finish(new Error("callFailed"));
     };
     const abort = () => finish(new Error("callFailed"));
     const timer = setTimeout(() => finish(new Error("callFailed")), 20000);
-    peer.addEventListener("connectionstatechange", check);
+    const poll = setInterval(check, 50);
     signal.addEventListener("abort", abort, { once: true });
-    check();
+    if (signal.aborted) abort();
+    else check();
   });
-}
-export async function startDictation(onStop: (blob: Blob) => void) {
-  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-  const mimeType = ["audio/webm;codecs=opus", "audio/mp4", "audio/webm"].find(
-    (type) => MediaRecorder.isTypeSupported(type),
-  );
-  let recorder: MediaRecorder;
-  try {
-    recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
-  } catch (error) {
-    stream.getTracks().forEach((track) => {
-      track.stop();
-    });
-    throw error;
-  }
-  const chunks: BlobPart[] = [];
-  let stopped = false;
-  let discarded = false;
-  let released = false;
-  const releaseTracks = () => {
-    if (released) return;
-    released = true;
-    stream.getTracks().forEach((track) => {
-      track.stop();
-    });
-  };
-  recorder.ondataavailable = (event) => {
-    if (event.data.size) chunks.push(event.data);
-  };
-  const timer = setTimeout(() => stop(), 60000);
-  const stop = () => {
-    if (stopped) return;
-    stopped = true;
-    clearTimeout(timer);
-    try {
-      if (recorder.state !== "inactive") recorder.stop();
-    } finally {
-      releaseTracks();
-    }
-  };
-  recorder.onstop = () => {
-    stopped = true;
-    clearTimeout(timer);
-    releaseTracks();
-    if (!discarded) onStop(new Blob(chunks, { type: recorder.mimeType }));
-  };
-  try {
-    recorder.start();
-  } catch (error) {
-    discarded = true;
-    clearTimeout(timer);
-    releaseTracks();
-    throw error;
-  }
-  return {
-    stop,
-    cancel: () => {
-      discarded = true;
-      stop();
-    },
-  };
 }

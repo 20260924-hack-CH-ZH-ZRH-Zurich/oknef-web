@@ -50,3 +50,43 @@ test("direct localized natural requests open tools without matching negations or
   ])
     expect(parseCommand(text).type).toBe("message");
 });
+
+test("voice workspace and advisory actions are strictly allowlisted and bounded", () => {
+  expect(parseVoiceAction("read_workspace", '{"reference":"assets"}')).toEqual({
+    name: "read_workspace",
+    arguments: { reference: "assets" },
+  });
+  expect(
+    parseVoiceAction("read_workspace", '{"reference":"passwords"}'),
+  ).toBeNull();
+  expect(
+    parseVoiceAction(
+      "read_workspace",
+      '{"reference":"assets","tenant":"other"}',
+    ),
+  ).toBeNull();
+  expect(
+    parseVoiceAction(
+      "run_advisory_workflow",
+      JSON.stringify({
+        workflow: "policy-review",
+        message: "Review a two-guardian policy",
+      }),
+    ),
+  ).not.toBeNull();
+  expect(
+    parseVoiceAction(
+      "run_advisory_workflow",
+      JSON.stringify({
+        workflow: "release-assets",
+        message: "Release everything",
+      }),
+    ),
+  ).toBeNull();
+  expect(
+    parseVoiceAction(
+      "run_advisory_workflow",
+      JSON.stringify({ workflow: "policy-review", message: "a".repeat(5001) }),
+    ),
+  ).toBeNull();
+});

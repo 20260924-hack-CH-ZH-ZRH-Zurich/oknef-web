@@ -2,16 +2,25 @@ import { useEffect, useState } from "react";
 import { voicePolicySchema } from "@/features/product/contracts";
 import { useProductMessages } from "@/features/product/messages";
 import { api, mutation } from "@/lib/api";
-export function VoicePolicy({ onBlocked }: { onBlocked?: () => void } = {}) {
+export function VoicePolicy({
+  onBlocked,
+  onAllowed,
+}: {
+  onBlocked?: () => void;
+  onAllowed?: (allowed: boolean) => void;
+} = {}) {
   const m = useProductMessages();
   const [mode, setMode] = useState("authenticated_session");
   const [error, setError] = useState(false);
   const [pending, setPending] = useState(false);
   useEffect(() => {
     api("/voice/policy", voicePolicySchema)
-      .then((policy) => setMode(policy.mode))
+      .then((policy) => {
+        setMode(policy.mode);
+        onAllowed?.(policy.session_allowed);
+      })
       .catch(() => setError(true));
-  }, []);
+  }, [onAllowed]);
   async function change(value: string) {
     setPending(true);
     setError(false);
@@ -22,6 +31,7 @@ export function VoicePolicy({ onBlocked }: { onBlocked?: () => void } = {}) {
         mutation("PUT", { mode: value }),
       );
       setMode(policy.mode);
+      onAllowed?.(policy.session_allowed);
       if (!policy.session_allowed) onBlocked?.();
     } catch {
       setError(true);

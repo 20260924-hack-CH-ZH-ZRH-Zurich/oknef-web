@@ -1,7 +1,6 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { z } from "zod";
 import { usePreferences } from "@/features/preferences/Preferences";
 import { useProductMessages } from "@/features/product/messages";
 import {
@@ -21,33 +20,18 @@ import {
 } from "./ChatChrome";
 import { ChatMessages } from "./ChatMessages";
 import { Composer } from "./Composer";
-import { parseCommand, type VoiceAction } from "./commands";
+import { parseCommand } from "./commands";
 import { withContext } from "./context";
+import { isImageRequest } from "./conversation";
 import { chatMessageTooLong } from "./limits";
-import { isImageRequest, useConversation } from "./useConversation";
+import { modelSchema } from "./models";
+import { useConversation } from "./useConversation";
 import { useMedia } from "./useMedia";
 import { VoicePolicy } from "./VoicePolicy";
+import { executeVoiceAction, miniAppVoiceContext } from "./voiceActions";
 
 import { type Workflow, workflowSchema } from "./workflows";
 
-const modelSchema = z
-  .object({
-    models: z.array(
-      z
-        .object({
-          id: z.string(),
-          label: z.string(),
-          capability: z.literal("chat"),
-        })
-        .strict(),
-    ),
-    image_model: z.string(),
-    realtime_model: z.string(),
-    transcription_model: z.string(),
-    provider: z.string(),
-    availability: z.string(),
-  })
-  .strict();
 export function Chat({
   initialSessionId,
   contextView,
@@ -73,6 +57,7 @@ export function Chat({
     return () => operations.current.abort();
   }, []);
   const [commandError, setCommandError] = useState(false);
+  const [voiceAllowed, setVoiceAllowed] = useState(false);
   const ensureSession = conversation.ensureSession;
   const openMiniApp = useCallback(
     async (kind: SessionKind) => {
@@ -84,6 +69,7 @@ export function Chat({
         if (signal.aborted) return;
         setInlineApp(kind);
         setInlineResult(null);
+        return true;
       } catch {
         if (!signal.aborted) setCommandError(true);
       } finally {
@@ -92,19 +78,6 @@ export function Chat({
     },
     [ensureSession],
   );
-  function voiceAction(action: VoiceAction) {
-    if (action.name === "open_miniapp") void openMiniApp(action.arguments.kind);
-    else {
-      const aliases: Record<string, string> = {
-        topology: "connections",
-        assets: "vault",
-        legacy: "succession",
-      };
-      router.push(
-        `/${locale}/workspace?view=${aliases[action.arguments.view] || action.arguments.view}`,
-      );
-    }
-  }
   const [input, setInput] = useState("");
   const [model, setModel] = useState("auto");
   const [models, setModels] = useState<string[]>([]);
@@ -127,7 +100,16 @@ export function Chat({
     conversation.addVoice,
     (text) =>
       setInput((previous) => `${previous}${previous ? " " : ""}${text}`),
-    voiceAction,
+    (action) =>
+      executeVoiceAction(action, {
+        locale,
+        currentView: contextView,
+        signal: operations.current.signal,
+        openMiniApp,
+        onWorkflow: conversation.addWorkflow,
+        navigate: router.push,
+      }),
+    conversation.prepareVoice,
   );
   useEffect(() => {
     api("/models", modelSchema)
@@ -165,6 +147,7 @@ export function Chat({
       inputTooLong ||
       conversation.pending ||
       preparing ||
+      media.voiceState === "connecting" ||
       (workflow && input.length > 5000)
     )
       return;
@@ -193,6 +176,19 @@ export function Chat({
       return;
     }
     setPreparing(false);
+    if (
+      media.voiceState === "live" &&
+      !workflow &&
+      !imageMode &&
+      !isImageRequest(input)
+    ) {
+      if (!media.sendText(content)) {
+        setCommandError(true);
+        return;
+      }
+      setInput("");
+      return;
+    }
     conversation.send(
       content,
       model,
@@ -210,7 +206,7 @@ export function Chat({
   }
   return (
     <section className="mx-auto flex min-h-[calc(100dvh-12rem)] max-w-3xl flex-col">
-      <ChatHeader media={media} onNew={reset} />
+      <ChatHeader media={media} onNew={reset} voiceAllowed={voiceAllowed} />
       <ChatCommands
         onChoose={(command) =>
           setInput((previous) => `${previous}${previous ? " " : ""}${command} `)
@@ -233,6 +229,7 @@ export function Chat({
             onSaved={(value) => {
               setInlineResult(value);
               setInlineApp(null);
+              media.addContext(miniAppVoiceContext(value));
             }}
           />
         </div>
@@ -263,7 +260,7 @@ export function Chat({
           {t(media.error)}
         </p>
       )}
-      <VoicePolicy onBlocked={media.endVoice} />
+      <VoicePolicy onBlocked={media.endVoice} onAllowed={setVoiceAllowed} />
       <Composer
         extract={conversation.extract}
         input={input}

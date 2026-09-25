@@ -1,9 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import {
-  boundedHistory,
-  isImageRequest,
-  type Message,
-} from "./useConversation";
+import { boundedHistory, isImageRequest, type Message } from "./conversation";
 
 describe("explicit in-chat image intent", () => {
   test("routes direct image requests in all four languages", () => {

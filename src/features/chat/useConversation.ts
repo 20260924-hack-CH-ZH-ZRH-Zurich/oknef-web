@@ -8,13 +8,9 @@ import {
 import { api, chatSchema, imageSchema, mutation } from "@/lib/api";
 import { boundedHistory, type Message, restoreMessages } from "./conversation";
 import { documentSchema, documentText } from "./documents";
-
-export type { Message } from "./conversation";
-
 import { chatMessageTooLong } from "./limits";
 import { type Workflow, workflowSchema } from "./workflows";
 
-export { boundedHistory, isImageRequest } from "./conversation";
 export function useConversation(locale: Locale, initialSessionId?: string) {
   const [sessionId, setSessionId] = useState<string | undefined>(
     initialSessionId,
@@ -25,6 +21,8 @@ export function useConversation(locale: Locale, initialSessionId?: string) {
   const sessionRequest = useRef<Promise<string> | null>(null);
   const voiceWrites = useRef<Promise<unknown>>(Promise.resolve());
   const [historyError, setHistoryError] = useState(false);
+  const restoring = useRef<Promise<unknown>>(Promise.resolve());
+  const restoreFailed = useRef(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [pending, setPending] = useState<
     "chat" | "image" | "review" | "document" | null
@@ -45,9 +43,10 @@ export function useConversation(locale: Locale, initialSessionId?: string) {
   }, []);
   useEffect(() => {
     if (!initialSessionId) return;
+    restoreFailed.current = false;
     const request = new AbortController();
     const signal = AbortSignal.any([request.signal, lifetime.current.signal]);
-    api(
+    restoring.current = api(
       `/chat/sessions/${encodeURIComponent(initialSessionId)}`,
       chatSessionDetailSchema,
       { signal },
@@ -61,6 +60,7 @@ export function useConversation(locale: Locale, initialSessionId?: string) {
         sessionRef.current = session.id;
       })
       .catch(() => {
+        if (!signal.aborted) restoreFailed.current = true;
         if (!signal.aborted)
           append({
             id: crypto.randomUUID(),
@@ -94,7 +94,6 @@ export function useConversation(locale: Locale, initialSessionId?: string) {
       if (sessionRequest.current === request) sessionRequest.current = null;
     }
   }, []);
-
   async function send(
     content: string,
     model: string,
@@ -235,6 +234,7 @@ export function useConversation(locale: Locale, initialSessionId?: string) {
     lifetime.current = new AbortController();
     sessionRequest.current = null;
     setHistoryError(false);
+    restoreFailed.current = false;
   }
   function addVoice(role: "user" | "assistant", content: string) {
     const signal = lifetime.current.signal;
@@ -272,7 +272,6 @@ export function useConversation(locale: Locale, initialSessionId?: string) {
         if (!signal.aborted) setHistoryError(true);
       });
   }
-
   return {
     messages,
     pending,
@@ -284,5 +283,18 @@ export function useConversation(locale: Locale, initialSessionId?: string) {
     sessionId,
     ensureSession,
     historyError,
+    prepareVoice: async () => {
+      await restoring.current;
+      if (restoreFailed.current) throw new Error("Session history unavailable");
+      await ensureSession();
+      return boundedHistory(history.current);
+    },
+    addWorkflow: (result: import("./workflows").WorkflowReply) =>
+      append({
+        id: crypto.randomUUID(),
+        role: "assistant",
+        content: "",
+        workflow: result,
+      }),
   };
 }

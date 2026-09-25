@@ -13,16 +13,19 @@ import {
 import { usePreferences } from "@/features/preferences/Preferences";
 import { useProductMessages } from "@/features/product/messages";
 import type { useMedia } from "./useMedia";
+import { voiceLabels } from "./voiceLabels";
 
 type Media = ReturnType<typeof useMedia>;
 export function ChatHeader({
   onNew,
   media,
+  voiceAllowed,
 }: {
   onNew: () => void;
   media: Media;
+  voiceAllowed: boolean;
 }) {
-  const { t } = usePreferences();
+  const { t, locale } = usePreferences();
   const m = useProductMessages();
   return (
     <header className="flex items-center justify-between border-b border-border pb-5">
@@ -55,9 +58,17 @@ export function ChatHeader({
         <button
           type="button"
           className={`icon-button ${media.voiceState !== "off" ? "bg-accent text-accent-ink" : ""}`}
-          title={t(media.voiceState === "off" ? "voice" : "endVoice")}
+          title={
+            !voiceAllowed && media.voiceState === "off"
+              ? voiceLabels[locale].unavailable
+              : t(media.voiceState === "off" ? "voice" : "endVoice")
+          }
           aria-label={t(media.voiceState === "off" ? "voice" : "endVoice")}
-          disabled={media.recording}
+          disabled={
+            media.recording ||
+            media.transcribing ||
+            (!voiceAllowed && media.voiceState === "off")
+          }
           onClick={media.toggleVoice}
         >
           <AudioLines size={18} />
@@ -139,12 +150,12 @@ export function ChatWelcome({
   );
 }
 export function VoiceStatus({ media }: { media: Media }) {
-  const { t } = usePreferences();
+  const { t, locale } = usePreferences();
   const m = useProductMessages();
   if (media.voiceState === "off") return null;
   return (
     <output className="mb-3 flex items-center gap-3 rounded-2xl bg-accent/20 p-4 text-sm">
-      <AudioLines size={20} className="animate-pulse text-good" />
+      <AudioLines size={20} className="text-good motion-safe:animate-pulse" />
       <div>
         <p>
           {t(
@@ -152,7 +163,11 @@ export function VoiceStatus({ media }: { media: Media }) {
           )}
         </p>
         <p className="mt-1 text-xs text-secondary">
-          {t("voiceDisclaimer")} {media.muted ? m.muted : m.listening}
+          {t("voiceDisclaimer")}{" "}
+          {media.muted ? m.muted : voiceLabels[locale][media.activity]}
+        </p>
+        <p className="mt-1 text-xs text-secondary">
+          {voiceLabels[locale].liveText}
         </p>
       </div>
       <button

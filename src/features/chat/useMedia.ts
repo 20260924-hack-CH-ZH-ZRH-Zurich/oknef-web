@@ -4,18 +4,26 @@ import type { Locale } from "@/features/preferences/Preferences";
 import { api } from "@/lib/api";
 import type { TranslationKey } from "@/lib/i18n/en";
 import { registerMediaStop } from "@/lib/mediaLifecycle";
-import type { VoiceAction } from "./commands";
 import { startDictation, startVoice, type VoiceHandle } from "./voice";
+import type {
+  VoiceActionHandler,
+  VoiceActivity,
+  VoiceMessage,
+} from "./voiceEvents";
 export function useMedia(
   locale: Locale,
   onVoice: (role: "user" | "assistant", content: string) => void,
   onText: (text: string) => void,
-  onAction?: (action: VoiceAction) => void,
+  onAction?: VoiceActionHandler,
+  prepareVoice?: () => Promise<readonly VoiceMessage[]>,
 ) {
   const [voiceState, setVoiceState] = useState<"off" | "connecting" | "live">(
     "off",
   );
   const [muted, setMuted] = useState(false);
+  const [activity, setActivity] = useState<VoiceActivity>("listening");
+  const callbacks = useRef({ onVoice, onText, onAction, prepareVoice });
+  callbacks.current = { onVoice, onText, onAction, prepareVoice };
   const [recording, setRecording] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
   const [error, setError] = useState<TranslationKey | null>(null);
@@ -64,12 +72,15 @@ export function useMedia(
     setError(null);
     setMuted(false);
     setVoiceState("connecting");
+    setActivity("listening");
     const controller = new AbortController();
     attempt.current = controller;
     try {
+      const history = await callbacks.current.prepareVoice?.();
+      controller.signal.throwIfAborted();
       const call = await startVoice(
         locale,
-        onVoice,
+        (role, text) => callbacks.current.onVoice(role, text),
         () => {
           if (
             mounted.current &&
@@ -83,7 +94,10 @@ export function useMedia(
           }
         },
         controller.signal,
-        onAction,
+        (action) =>
+          callbacks.current.onAction?.(action) ??
+          Promise.resolve({ completed: false }),
+        { history, onActivity: setActivity },
       );
       if (
         !mounted.current ||
@@ -139,7 +153,7 @@ export function useMedia(
         !request.signal.aborted &&
         generation.current === epoch
       )
-        onText(result.text);
+        callbacks.current.onText(result.text);
     } catch {
       if (
         mounted.current &&
@@ -191,8 +205,12 @@ export function useMedia(
   }
   return {
     voiceState,
+    activity,
     muted,
+    sendText: (text: string) => voice.current?.sendText(text) ?? false,
+    addContext: (text: string) => voice.current?.addContext(text) ?? false,
     toggleMute: () => {
+      if (!voice.current) return;
       const next = !muted;
       voice.current?.setMuted(next);
       setMuted(next);
