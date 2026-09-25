@@ -8,8 +8,11 @@ import {
   ScanQrCode,
   Video,
 } from "lucide-react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/buttons/Button/Button";
+import { useCaptureMessages } from "@/features/capture/messages";
 import {
   type SecuritySession,
   type SessionKind,
@@ -34,6 +37,7 @@ export function MiniAppLauncher({
   onSelect: (kind: SessionKind) => void;
 }) {
   const m = useSecurityMessages();
+  const capture = useCaptureMessages();
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {miniAppTools.map(({ kind, icon: Icon }) => (
@@ -47,23 +51,55 @@ export function MiniAppLauncher({
             <Icon className="text-good" size={28} />
             <ArrowUpRight size={17} className="text-secondary" />
           </div>
-          <h2 className="text-base font-semibold">{m[kind]}</h2>
+          <h2 className="text-base font-semibold">
+            {kind === "document"
+              ? capture.document
+              : kind === "identity"
+                ? capture.face
+                : m[kind]}
+          </h2>
           <p className="mt-3 text-xs leading-6 text-secondary">
-            {m[`${kind}Help`]}
+            {kind === "video"
+              ? capture.videoHelp
+              : kind === "identity"
+                ? capture.faceHelp
+                : m[`${kind}Help`]}
           </p>
         </button>
       ))}
+      <Link
+        href="/workspace?view=identity"
+        className="group rounded-2xl border border-border bg-surface p-6 text-left transition hover:border-good"
+      >
+        <div className="mb-5 flex justify-between">
+          <Fingerprint className="text-good" size={28} />
+          <ArrowUpRight size={17} className="text-secondary" />
+        </div>
+        <h2 className="text-base font-semibold">{capture.passkey}</h2>
+        <p className="mt-3 text-xs leading-6 text-secondary">
+          {capture.passkeyHelp}
+        </p>
+      </Link>
     </div>
   );
 }
 export function MiniApps({ onSaved }: { onSaved: () => void }) {
   const m = useProductMessages();
+  const capture = useCaptureMessages();
   const params = useSearchParams();
   const initial = sessionKindSchema.safeParse(params.get("app"));
   const [kind, setKind] = useState<SessionKind | null>(
     initial.success ? initial.data : null,
   );
   const [session, setSession] = useState<SecuritySession | null>(null);
+  const requestedApp = params.get("app");
+  useEffect(() => {
+    const next = sessionKindSchema.safeParse(requestedApp);
+    if (next.success) {
+      setKind(next.data);
+      setSession(null);
+    }
+  }, [requestedApp]);
   return (
     <div className="space-y-6">
       <header>
@@ -79,7 +115,16 @@ export function MiniApps({ onSaved }: { onSaved: () => void }) {
         />
       ) : (
         <>
-          <MiniAppLauncher onSelect={setKind} />
+          {!kind && <MiniAppLauncher onSelect={setKind} />}
+          {kind && (
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setKind(null)}
+            >
+              {capture.back}
+            </Button>
+          )}
           {kind && (
             <SessionForm
               key={kind}
