@@ -1,11 +1,16 @@
 import { createServer, request as httpRequest } from "node:http";
 import { request as httpsRequest } from "node:https";
 import next from "next";
+import { extensionSocketGateway } from "./extension-socket.mjs";
 import { runtimeConfig } from "./runtime-config.mjs";
 
 const config = runtimeConfig();
+const extensionSockets = extensionSocketGateway(config);
 let handle;
-const server = createServer((request, response) => handle(request, response));
+const server = createServer(async (request, response) => {
+  if (!(await extensionSockets.handle(request, response)))
+    handle(request, response);
+});
 const app = next({
   dev: config.dev,
   hostname: config.hostname,
@@ -41,6 +46,16 @@ server.on("upgrade", (request, socket, head) => {
     socket.destroy();
     return;
   }
+  const cookie = extension
+    ? extensionSockets.consume(
+        request.headers.origin,
+        request.headers["sec-websocket-protocol"],
+      )
+    : request.headers.cookie;
+  if (!cookie) {
+    socket.destroy();
+    return;
+  }
   const url = new URL("/api/ws", config.backend);
   const forward = (url.protocol === "https:" ? httpsRequest : httpRequest)(
     url,
@@ -51,7 +66,7 @@ server.on("upgrade", (request, socket, head) => {
         connection: "Upgrade",
         "sec-websocket-key": request.headers["sec-websocket-key"],
         "sec-websocket-version": "13",
-        cookie: request.headers.cookie || "",
+        cookie,
         origin: config.publicOrigin,
       },
       timeout: 15000,
@@ -68,7 +83,7 @@ server.on("upgrade", (request, socket, head) => {
     }
     upstream.setTimeout(0);
     socket.write(
-      `HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: ${response.headers["sec-websocket-accept"]}\r\n\r\n`,
+      `HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: ${response.headers["sec-websocket-accept"]}\r\n${extension ? "Sec-WebSocket-Protocol: oknef.v1\r\n" : ""}\r\n`,
     );
     if (head.length) upstream.write(head);
     if (upstreamHead.length) socket.write(upstreamHead);
