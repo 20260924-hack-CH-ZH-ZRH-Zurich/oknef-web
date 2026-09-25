@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import { EventEmitter } from "node:events";
 import {
   createServer,
   request as httpRequest,
@@ -61,6 +62,84 @@ test("malformed upgrades are rejected before authorization or ticket consumption
     Buffer.alloc(0),
   );
   expect(authorized).toBe(2);
+});
+
+class TestTransport extends EventEmitter {
+  destroyed = false;
+  destroy() {
+    if (!this.destroyed) {
+      this.destroyed = true;
+      this.emit("close");
+    }
+    return this;
+  }
+}
+
+function deadlineFixture() {
+  const socket = new TestTransport();
+  const forward = new TestTransport();
+  const events: Array<{ stage: string; code?: string; status?: number }> = [];
+  websocketUpgrade(() => forward, {
+    handshakeTimeoutMs: 20,
+    onEvent: (event) => events.push(event),
+  })(handshake(), socket, Buffer.alloc(0));
+  return { socket, forward, events };
+}
+
+test("absolute handshake deadline cancels both transports despite upstream activity", async () => {
+  const { socket, forward, events } = deadlineFixture();
+  const progress = setInterval(
+    () => forward.emit("information", { statusCode: 100 }),
+    2,
+  );
+  try {
+    await new Promise((resolve) => setTimeout(resolve, 40));
+    expect(socket.destroyed).toBe(true);
+    expect(forward.destroyed).toBe(true);
+    expect(
+      events.filter((event) => event.stage === "handshake_timeout"),
+    ).toHaveLength(1);
+  } finally {
+    clearInterval(progress);
+  }
+});
+
+test("successful upgrade clears the deadline without ending its live transport", async () => {
+  const { socket, forward, events } = deadlineFixture();
+  forward.emit("upgrade", { statusCode: 101 });
+  await new Promise((resolve) => setTimeout(resolve, 40));
+  expect(socket.destroyed).toBe(false);
+  expect(forward.destroyed).toBe(false);
+  expect(events).toContainEqual({ stage: "upstream_upgrade", status: 101 });
+  expect(events.some((event) => event.stage === "handshake_timeout")).toBe(
+    false,
+  );
+  socket.destroy();
+  expect(forward.destroyed).toBe(true);
+});
+
+test("upstream errors clear the deadline and diagnostics exclude untrusted values", async () => {
+  const { socket, forward, events } = deadlineFixture();
+  forward.emit("error", {
+    code: "https://private.invalid/credential",
+    message: "forbidden diagnostic payload",
+    headers: { cookie: "forbidden diagnostic payload" },
+  });
+  await new Promise((resolve) => setTimeout(resolve, 40));
+  expect(socket.destroyed).toBe(true);
+  expect(events).toContainEqual({ stage: "upstream_error" });
+  expect(events.some((event) => event.stage === "handshake_timeout")).toBe(
+    false,
+  );
+  expect(JSON.stringify(events)).not.toContain("private.invalid");
+  expect(JSON.stringify(events)).not.toContain("forbidden diagnostic payload");
+});
+
+test("an upstream close before handshake also releases the waiting client", () => {
+  const { socket, forward, events } = deadlineFixture();
+  forward.destroy();
+  expect(socket.destroyed).toBe(true);
+  expect(events).toContainEqual({ stage: "upstream_closed" });
 });
 
 test("closing the client during authentication cancels the pending upstream handshake", async () => {

@@ -61,6 +61,8 @@ const handleUpgrade = websocketUpgrade((request, socket, head) => {
   const forward = (url.protocol === "https:" ? httpsRequest : httpRequest)(
     url,
     {
+      // An upgrade owns its transport; never reuse a pooled HTTP connection.
+      agent: false,
       headers: {
         host: url.host,
         upgrade: "websocket",
