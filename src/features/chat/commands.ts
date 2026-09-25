@@ -1,0 +1,100 @@
+export const miniAppNames = [
+  "qr",
+  "link",
+  "email",
+  "call",
+  "document",
+  "video",
+  "identity",
+] as const;
+export type MiniAppName = (typeof miniAppNames)[number];
+export type ChatCommand =
+  | { type: "miniapp"; kind: MiniAppName }
+  | { type: "new" }
+  | { type: "plan"; content: string }
+  | { type: "message"; content: string };
+export function parseCommand(input: string): ChatCommand {
+  const trimmed = input.trim();
+  const match = /^\/([a-z]+)(?:\s+([\s\S]*))?$/i.exec(trimmed);
+  if (!match) {
+    const patterns: [MiniAppName, RegExp][] = [
+      [
+        "qr",
+        /^(?:(?:please|por favor|bitte)\s+)?(?:scan|check|inspect|escanear|escanea|prüfe|scanne|scanner|vérifier)\s+(?:(?:a|the|this|my|un|el|este|einen?|den|diesen|le|ce)\s+)?(?:qr(?:\s+code)?|code\s+qr|código\s+qr|qr-code)[.!?]?$/i,
+      ],
+      [
+        "email",
+        /^(?:please\s+)?(?:check|inspect|review|revisa|prüfe|vérifier)\s+(?:(?:this|my|an?|the|un|el|este|die|diese|le|ce)\s+)?(?:email|e-mail|correo)[.!?]?$/i,
+      ],
+      [
+        "video",
+        /^(?:please\s+)?(?:check|analyze|review|analiza|prüfe|analyser)\s+(?:(?:this|my|an?|the|un|el|este|das|dieses|le|ce)\s+)?(?:video|vídeo|vidéo)[.!?]?$/i,
+      ],
+      [
+        "call",
+        /^(?:please\s+)?(?:check|review|transcribe|transcribir|transkribiere|transcrire)\s+(?:(?:this|my|an?|the|una?|la|esta|den|diesen|le|cet)\s+)?(?:call|llamada|anruf|appel)[.!?]?$/i,
+      ],
+      [
+        "identity",
+        /^(?:please\s+)?(?:check|scan|review|revisa|prüfe|vérifier)\s+(?:(?:this|my|an?|the|mi|el|este|meinen?|den|diesen|mon|le|ce)\s+)?(?:passport|identity document|pasaporte|reisepass|passeport)[.!?]?$/i,
+      ],
+      [
+        "document",
+        /^(?:please\s+)?(?:check|scan|review|revisa|prüfe|vérifier)\s+(?:(?:this|my|an?|the|un|el|este|das|dieses|le|ce)\s+)?(?:document|documento|dokument)[.!?]?$/i,
+      ],
+    ];
+    const intent = patterns.find(([, pattern]) => pattern.test(trimmed));
+    return intent
+      ? { type: "miniapp", kind: intent[0] }
+      : { type: "message", content: trimmed };
+  }
+  const command = match[1].toLowerCase();
+  if (miniAppNames.includes(command as MiniAppName))
+    return { type: "miniapp", kind: command as MiniAppName };
+  if (command === "new") return { type: "new" };
+  if (command === "plan")
+    return {
+      type: "plan",
+      content: `Create a step-by-step advisory plan. Do not execute actions. ${match[2] || "Help me review my digital estate and identity protection."}`,
+    };
+  return { type: "message", content: trimmed };
+}
+export type VoiceAction =
+  | { name: "open_miniapp"; arguments: { kind: MiniAppName } }
+  | { name: "navigate_workspace"; arguments: { view: string } };
+export function parseVoiceAction(
+  name: unknown,
+  input: unknown,
+): VoiceAction | null {
+  if (typeof input !== "string" || input.length > 1000) return null;
+  try {
+    const args: unknown = JSON.parse(input);
+    if (!args || typeof args !== "object" || Array.isArray(args)) return null;
+    const value = args as Record<string, unknown>;
+    if (
+      name === "open_miniapp" &&
+      Object.keys(value).length === 1 &&
+      miniAppNames.includes(value.kind as MiniAppName)
+    )
+      return { name, arguments: { kind: value.kind as MiniAppName } };
+    if (
+      name === "navigate_workspace" &&
+      Object.keys(value).length === 1 &&
+      [
+        "miniapps",
+        "drive",
+        "integrations",
+        "topology",
+        "sessions",
+        "assets",
+        "security",
+        "legacy",
+        "admin",
+      ].includes(String(value.view))
+    )
+      return { name, arguments: { view: String(value.view) } };
+  } catch {
+    return null;
+  }
+  return null;
+}

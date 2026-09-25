@@ -1,0 +1,203 @@
+import type { SecurityMessages } from "../messages";
+export const de: SecurityMessages = {
+  video: "Videoprüfung",
+  identity: "Identitätsdokument",
+  videoHelp:
+    "Einzelbild und Quelle prüfen. Dies beweist keine Deepfake-Echtheit.",
+  identityHelp:
+    "Text extrahieren und Referenz vergleichen. Kein Identitätsnachweis wird ausgestellt.",
+  extensionTitle: "Browser-Erweiterung herunterladen",
+  extensionHelp:
+    "Lokale Prüfung von Links und ausgewähltem Text. Das entpackte Paket im Entwicklermodus manuell installieren; keine Store-Veröffentlichung. Nachweise werden nur durch deine Aktion an Oknef gesendet.",
+  accountId: "Deine Oknef-Konto-ID",
+  recipientId: "Oknef-Konto-ID des Empfängers",
+  accountIdHelp:
+    "Erhalte die Konto-ID direkt über einen vertrauenswürdigen Kanal und vergleiche sie vor der Einladung. Die Einladung ist an ID und E-Mail gebunden; eine E-Mail-Adresse allein genügt nicht.",
+  decisionPending: "Eine Entscheidung oder Einladung wartet auf dich",
+  inboxUnavailable:
+    "Benachrichtigungen sind vorübergehend nicht verfügbar. Öffne Freigaben zum erneuten Versuch.",
+  independentReminder:
+    "Prüfe die Anfrage vor einer Aktion über einen unabhängig bekannten Kontakt. Gib keine Passwörter, privaten Schlüssel oder Einmalcodes weiter.",
+  title: "Deine Sicherheit im Zusammenhang",
+  intro:
+    "Prüfe Links, Nachrichten oder Dokumente. Bewahre Nachweise, verstehe Hinweise und entscheide über den nächsten Schritt.",
+  security: "Sicherheit",
+  sessions: "Sitzungen",
+  matrix: "Angriffskarte",
+  forensic: "Forensiklabor",
+  topology: "Vermögenstopologie",
+  learn: "Sicher üben",
+  protections: "Schutz erklärt",
+  approvals: "Freigaben",
+  files: "Dateischutz",
+  newSession: "Neue Nachweissitzung",
+  sessionName: "Name der Sitzung",
+  content: "Zu prüfender Inhalt",
+  reference: "Referenztext (optional)",
+  referenceHelp:
+    "Vergleiche extrahierten Text mit einer vertrauenswürdigen Referenz. Eine Übereinstimmung beweist keine Echtheit.",
+  evidenceConsent:
+    "Ich darf diesen Inhalt übermitteln. Er wird im Arbeitsbereich gespeichert und mit Regeln geprüft; keine Passwörter oder privaten Schlüssel einfügen.",
+  check: "Prüfen und speichern",
+  checking: "Wird geprüft…",
+  empty: "Noch keine Nachweissitzungen",
+  emptyBody:
+    "Starte oben eine Mini-App. Jede Prüfung erzeugt eine gespeicherte Sitzung mit Inhalt und Erklärung.",
+  link: "Linkprüfung",
+  qr: "QR-Ziel",
+  email: "E-Mail-Nachweis",
+  call: "Anruftranskript",
+  document: "Dokumenttext",
+  linkHelp:
+    "Füge eine URL ein, um ihre Struktur vor dem Öffnen zu prüfen. Links werden hierbei weder abgerufen noch geöffnet.",
+  qrHelp:
+    "Wähle ein QR-Bild oder ein Foto auf einem unterstützten Telefon oder füge das erkannte Ziel ein. Prüfe den Text vor dem Speichern. Das Ziel wird nie geöffnet.",
+  emailHelp:
+    "Füge eine E-Mail ein, die du prüfen darfst. Dein Postfach wird weder verbunden noch überwacht.",
+  callHelp:
+    "Füge ein Transkript mit Erlaubnis der Beteiligten ein. Textprüfungen erkennen nicht, ob eine Stimme menschlich oder KI-generiert ist.",
+  documentHelp:
+    "Füge extrahierten Dokumenttext ein. Struktur- und Referenzprüfungen authentifizieren kein Ausweisdokument.",
+  review_required: "Prüfung erforderlich",
+  no_signals: "Keine Regelhinweise",
+  inconclusive: "Nicht eindeutig",
+  synthetic: "Übungssitzung",
+  live: "Übermittelter Nachweis",
+  methods: "Regelbasierte Nachweisprüfung",
+  boundaries:
+    "Hinweise sind nicht kalibriert und erfordern dein Urteil. Kein Ergebnis verifiziert eine Identität, beweist einen Deepfake oder garantiert einen sicheren Link.",
+  signal: "Beobachtete Hinweise",
+  noSignals:
+    "Keine konfigurierte Regel trifft zu. Bleibe vorsichtig und prüfe über einen unabhängigen Kanal.",
+  evidence: "Nachweis",
+  assessment: "Bewertung",
+  questions: "Zu dieser Sitzung fragen",
+  question: "Deine Frage",
+  ask: "Gespeicherte Nachweise befragen",
+  noQuestions: "Fragen und Antworten bleiben bei dieser Sitzung.",
+  storedAnswer: "Antwort aus Nachweisregeln",
+  sourceLanguage:
+    "Nachweise und Regelerklärungen erscheinen in ihrer Originalsprache.",
+  mode: "Prüfeinstellung",
+  standard: "Standard",
+  active: "Aktiv",
+  paranoid: "Paranoid",
+  modeHelp:
+    "Für Prüfungen in diesem Arbeitsbereich gespeichert. Aktiviert keine Geräte-, Postfach- oder Anrufüberwachung.",
+  saved: "Gespeichert",
+  error:
+    "Die Aktion konnte nicht abgeschlossen werden. Bitte erneut versuchen.",
+  loading: "Nachweise werden geladen…",
+  close: "Schließen",
+  refresh: "Aktualisieren",
+  back: "Zurück zu Sitzungen",
+  trend: "Prüfhinweise der letzten 30 Tage",
+  trendHelp:
+    "Gespeicherte und markierte Prüfungen nach UTC-Tag. Übungen sind ausgeschlossen. Dies sind keine bestätigten Betrugserkennungen.",
+  checks: "Prüfungen",
+  flagged: "Zur Prüfung markiert",
+  noHistory: "Keine Prüfungen in diesem Zeitraum.",
+  date: "Datum (UTC)",
+  showData: "Tagesdaten anzeigen",
+  alert: "Neue Nachweise benötigen Prüfung",
+  alertHelp:
+    "Eine Prüfung hat einen möglichen Risikohinweis gefunden. Öffne den Nachweis, bevor du Schlüsse ziehst.",
+  viewEvidence: "Nachweis öffnen",
+  dismiss: "Hinweis schließen",
+  compliance: "Compliance-Metriken",
+  complianceHelp:
+    "Nachweisabdeckung der Prüfliste. Dies ist keine ISO/IEC-30107-Zertifizierung oder FINMA-Konformität und misst keine Erkennungsgenauigkeit.",
+  notAssessed: "Nicht bewertet",
+  evidenceCoverage: "Nachweisabdeckung der Prüfliste",
+  records: "Nachweisdatensätze",
+  status: "Status",
+  control: "Prüfkontrolle",
+  noEvidence: "Nachweise fehlen",
+  hasEvidence: "Nachweise vorhanden",
+  externalReview: "Unabhängige Bewertung erforderlich",
+  impact: "Was passieren kann",
+  mitigation: "So reagierst du",
+  validation: "Validierungsgrenze",
+  focus: "Gewählter Angriffsvektor: schädliche QR-Ziele",
+  focusBody:
+    "Prüfe ein QR-Ziel ohne Navigation. Zeige auffällige Strukturen und Anweisungen, bewahre Nachweise und fordere eine menschliche Entscheidung. Reputation und Weiterleitungsketten werden nicht geprüft.",
+  topologyHelp:
+    "Karte aus gespeicherten Vermögenswerten, Mitgliedern, Nachfolgeplänen und Sitzungen. Verbindungen zeigen Datensätze, keine verifizierten Zugriffe oder Netzwerkentdeckung.",
+  workspace: "Arbeitsbereich",
+  assets: "Vermögenswerte",
+  members: "Mitglieder",
+  plans: "Nachfolgepläne",
+  nodeCount: "Erfasste Beziehungen",
+  emptyGraph:
+    "Füge Vermögenswerte oder Nachweise hinzu, um die Karte zu erweitern.",
+  learningTitle: "Die nächste Entscheidung üben",
+  learningHelp:
+    "Starte eine isolierte, gekennzeichnete Übung. Übungsdaten bleiben von echten Trends getrennt und installieren keine Fallen auf fremden Systemen.",
+  phishing: "Phishing-Übung",
+  prompt_injection: "Übung zu Anweisungsinjektion",
+  honeytoken: "Köder-Übung",
+  deepfake: "Übung zu Deepfake-Behauptungen",
+  startPractice: "Übung starten",
+  honeyHelp:
+    "Die Übung erstellt einen Ködermarker in einem Übungsdatensatz. Kein Internet-Honeypot, keine Zugangsdaten und keine Hintergrundüberwachung werden eingerichtet.",
+  privacyTitle: "Was privat bleibt",
+  privacyBody:
+    "Tresorgeheimnisse werden in deinem Browser verschlüsselt. Metadaten und übermittelte Nachweise sind für berechtigte Dienste sichtbar. Der Dateischutz erklärt seine separate lokale Verschlüsselungsgrenze.",
+  encryption: "Verschlüsselung und Wiederherstellung",
+  device: "Dein Gerät",
+  encrypted: "Verschlüsselte Datei",
+  recipient: "Empfängerschlüssel",
+  localKey: "Lokaler privater Schlüssel",
+  humanApproval: "Menschliche Freigabe",
+  recoveryBoundary:
+    "Entscheidungen von Vertrauenspersonen werden als Freigaben protokolliert. Sie geben keine Tresorschlüssel frei und führen keine Überweisungen aus.",
+  openFiles: "Dateischutz öffnen",
+  openVault: "Verschlüsselten Tresor öffnen",
+  workflowTitle: "Nachvollziehbare Entscheidungen",
+  workflowHelp:
+    "Wähle bestätigte Mitglieder, fordere mindestens zwei unabhängige Prüfer und verfolge ihre Entscheidungen. Freigaben führen keine Überweisungen aus und geben keine Geheimnisse frei.",
+  invite: "Prüfer einladen",
+  emailAddress: "E-Mail-Adresse",
+  inviteHelp:
+    "Die Person muss sich mit dieser Adresse registrieren und in Oknef annehmen. E-Mail-Besitz wird nicht geprüft; es wird keine E-Mail versendet.",
+  invitationSent: "In-App-Einladung gespeichert",
+  incoming: "Deine Einladungen",
+  accept: "Einladung annehmen",
+  noInvitations: "Keine offenen Einladungen",
+  policy: "Freigaberichtlinie",
+  createPolicy: "Richtlinie erstellen",
+  policyTitle: "Name der Richtlinie",
+  reviewers: "Bestätigte Prüfer",
+  required: "Erforderliche Freigaben",
+  twoReviewers:
+    "Lade mindestens zwei andere Personen ein und lasse sie annehmen, bevor du eine Richtlinie erstellst.",
+  newRequest: "Entscheidung anfordern",
+  requestTitle: "Entscheidungstitel",
+  description: "Beschreibung",
+  request: "Anfrage erstellen",
+  pending: "Ausstehend",
+  approved: "Genehmigt",
+  rejected: "Abgelehnt",
+  approve: "Genehmigen",
+  reject: "Ablehnen",
+  votes: "Erfasste Entscheidungen",
+  decisionMap: "Entscheidungskarte",
+  requester: "Anfrage",
+  quorum: "Erforderliches Quorum",
+  noExecution: "Nur Protokoll · keine Ausführung",
+  noRequests: "Noch keine Entscheidungsanfragen",
+  membershipHelp:
+    "Mitgliedschaft basiert auf Registrierung und In-App-Einladung; sie beweist keine rechtliche Identität.",
+  sampleTitle: "Diese Prüfung benennen",
+  pastedEvidence: "Inhalt hier einfügen",
+  view: "Öffnen",
+  learningBadge: "Synthetisch · isoliert",
+  notifications: "In-App-Benachrichtigungen",
+  useMiniApp: "Weitere Mini-App starten",
+  exportEvidence: "Nachweise als JSON laden",
+  selected: "Ausgewählt",
+  confirmRequired:
+    "Bestätige die Berechtigung und prüfe die Felder vor dem Absenden.",
+  legacyInvitation:
+    "Diese ältere Einladung ist keinem Empfängerkonto zugeordnet. Bitte den Eigentümer um eine neue Einladung mit deiner Konto-ID.",
+};

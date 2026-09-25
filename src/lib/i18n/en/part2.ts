@@ -1,0 +1,123 @@
+export const part2 = {
+  finance: "Financial account",
+  digital: "Digital account",
+  document: "Document",
+  crypto: "Digital assets",
+  property: "Property",
+  other: "Other",
+  assetSaved: "Asset saved",
+  assetDeleted: "Asset deleted",
+  unnamed: "Untitled",
+  status: "Status",
+  actions: "Actions",
+  created: "Created",
+  updated: "Updated",
+  value: "Value",
+  private: "Private",
+  draft: "Draft",
+  review: "Human review required",
+  reviewRequested: "Review requested",
+  planName: "Plan name",
+  planInstructions: "Your intentions",
+  guardianNames: "Guardian email addresses",
+  guardianHint:
+    "Separate email addresses with commas. Recording an address does not invite or verify that person.",
+  quorum: "Required guardian approvals",
+  waitingDays: "Waiting period (days)",
+  requestReview: "Request a review",
+  successionNotice:
+    "A planning record does not transfer assets, certify a death, or establish legal authority. Every release requires independent evidence and qualified human review.",
+  planSaved: "Legacy plan saved",
+  reviewSaved: "Review request recorded",
+  noPlans: "Your legacy starts with one thoughtful decision.",
+  noPlansBody:
+    "Create your first plan and make your wishes easier for your loved ones to understand.",
+  guardianTitle: "Your trusted circle",
+  guardianBody:
+    "People named in your legacy plans. A name here is an intention, not an invitation or a verified identity.",
+  noGuardians: "Add guardians when you create a legacy plan.",
+  assignedPlans: "Linked plans",
+  humanGate: "You stay in control",
+  humanGateBody:
+    "The assistant can suggest and explain. It cannot approve a succession release or move your assets.",
+  trustTitle: "Trust is earned in the details.",
+  trustBody:
+    "Understand the protections that are active and the capabilities still being developed.",
+  active: "Active",
+  planned: "Research & development",
+  sessionProtection: "Session protection",
+  sessionProtectionBody:
+    "HTTP-only session cookies, server authorization, and workspace-scoped access.",
+  controlledAI: "Controlled AI access",
+  controlledAIBody:
+    "AI requests pass through the server. Provider credentials stay out of the browser.",
+  injection: "Untrusted content handling",
+  injectionBody:
+    "Imported text and model answers are treated as data. Generated UI cannot execute code.",
+  futureSecurity: "Post-quantum recovery",
+  futureSecurityBody:
+    "Post-quantum cryptography and managed recovery remain research work. Passkey sign-in is available for personal accounts in account settings.",
+  securityNote:
+    "This prototype combines an asset inventory, planning tools, and a browser-encrypted vault. It has not undergone an independent security audit and does not certify identity or release assets.",
+  chatTitle: "A thoughtful partner for your digital life.",
+  chatBody:
+    "Ask a question, map your legacy, or make a complex idea easier to see.",
+  chatPlaceholder: "Ask Oknef anything about your digital legacy…",
+  send: "Send message",
+  stop: "Stop",
+  model: "Choose an AI model",
+  auto: "Automatic",
+  newChat: "New conversation",
+  imageMode: "Generate an image in this conversation",
+  image: "Image",
+  chat: "Chat",
+  voice: "Start a voice conversation",
+  endVoice: "End voice conversation",
+  dictation: "Dictate a message",
+  stopRecording: "Stop recording",
+  recording: "Listening…",
+  transcribing: "Transcribing…",
+  voiceConnecting: "Connecting your voice…",
+  voiceLive: "Voice is connected",
+  microphoneDenied:
+    "Microphone access was not granted. Allow it in browser settings to use voice.",
+  imageHint: "Describe the visual you want to create.",
+  chatHint:
+    "AI can make mistakes. Check important decisions with a qualified professional.",
+  thinking: "Preparing your answer…",
+  imageWorking: "Creating your image…",
+  providerError:
+    "The AI provider could not complete this request. No answer was generated.",
+  provider: "Provider",
+  modelUsed: "Model",
+  requestId: "Request",
+  verification: "Verification",
+  responseDetails: "Response details",
+  generatedImage: "AI-generated visual",
+  imageDisclosure:
+    "AI-generated illustration; not proof of identity, ownership, or legal authority.",
+  suggestion1: "Where should I start?",
+  suggestion2: "Help me prepare a family plan",
+  suggestion3: "Explain social recovery",
+  suggestion4: "Visualize my digital legacy",
+  prompt1:
+    "Where should I start preparing my digital legacy? Give me a short, practical checklist.",
+  prompt2:
+    "Help me prepare a family succession plan. Explain guardian quorum and the need for legal review.",
+  prompt3: "Explain social recovery and its risks using a simple comparison.",
+  prompt4:
+    "Create a clear, calm illustration of a person connecting their digital assets to a trusted family circle.",
+  answer: "Answer",
+  capabilities: "Service capabilities",
+  account: "Your account",
+  member: "Member",
+  role: "Role",
+  workspace: "Workspace",
+  personalView: "Your personal workspace",
+  familyView: "A shared sense of preparedness",
+  companyView: "Continuity starts with clarity",
+  familyBody:
+    "Organize the intentions, people, and assets that matter to your family.",
+  companyBody:
+    "Record business assets and continuity plans. Employee invitations and company SSO require a configured identity service.",
+} as const;

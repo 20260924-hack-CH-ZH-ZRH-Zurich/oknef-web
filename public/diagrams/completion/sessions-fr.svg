@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="760" viewBox="0 0 1400 760" role="img" aria-labelledby="title desc" xml:lang="fr">
+<title id="title">Une session, des preuves reliées</title><desc id="desc">Une session décrit ce qui a été examiné. Elle ne prouve ni identité ni authenticité.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#527a6c"/></marker></defs>
+<rect width="1400" height="760" rx="28" fill="#f4f7f2"/>
+<g font-family="Arial,Helvetica,sans-serif">
+<text x="62" y="67" fill="#527a6c" font-size="17" font-weight="700">OKNEF  /  FR</text>
+<text x="62" y="119" fill="#183e37" font-size="34" font-weight="700">Une session, des preuves reliées</text>
+<path d="M 612 239 L 744 239" stroke="#527a6c" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+<path d="M 1020 306 L 340 362" stroke="#527a6c" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+<path d="M 612 424 L 744 424" stroke="#527a6c" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+<path d="M 1020 490 L 680 546" stroke="#527a6c" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+<rect x="62" y="178" width="550" height="126" rx="17" fill="white" stroke="#c5d4cb" stroke-width="2"/>
+<text x="86" y="212" fill="#527a6c" font-size="15" font-weight="700">01</text>
+<text x="86" y="244" fill="#183e37" font-size="23" font-weight="700">Ouvrir le chat ou une mini-app</text>
+<text x="86" y="277" fill="#183e37" font-size="19" font-weight="400">Choisir la tâche et l’espace de travail</text>
+<rect x="744" y="178" width="550" height="126" rx="17" fill="white" stroke="#c5d4cb" stroke-width="2"/>
+<text x="768" y="212" fill="#527a6c" font-size="15" font-weight="700">02</text>
+<text x="768" y="244" fill="#183e37" font-size="23" font-weight="700">Capturer avec autorisation</text>
+<text x="768" y="277" fill="#183e37" font-size="19" font-weight="400">QR, audio, image ou document</text>
+<rect x="62" y="362" width="550" height="126" rx="17" fill="white" stroke="#c5d4cb" stroke-width="2"/>
+<text x="86" y="396" fill="#527a6c" font-size="15" font-weight="700">03</text>
+<text x="86" y="428" fill="#183e37" font-size="23" font-weight="700">Vérifier avant l’envoi</text>
+<text x="86" y="461" fill="#183e37" font-size="19" font-weight="400">Partager uniquement les éléments choisis</text>
+<rect x="744" y="362" width="550" height="126" rx="17" fill="white" stroke="#c5d4cb" stroke-width="2"/>
+<text x="768" y="396" fill="#527a6c" font-size="15" font-weight="700">04</text>
+<text x="768" y="428" fill="#183e37" font-size="23" font-weight="700">Enregistrer la session</text>
+<text x="768" y="461" fill="#183e37" font-size="19" font-weight="400">Conserver méthode, date et limites</text>
+<rect x="402" y="546" width="550" height="126" rx="17" fill="white" stroke="#c5d4cb" stroke-width="2"/>
+<text x="426" y="580" fill="#527a6c" font-size="15" font-weight="700">05</text>
+<text x="426" y="612" fill="#183e37" font-size="23" font-weight="700">Revenir et poser des questions</text>
+<text x="426" y="645" fill="#183e37" font-size="19" font-weight="400">Relier les preuves aux actifs et actions</text>
+<text x="62" y="707" fill="#42564e" font-size="19" font-weight="400">Une session décrit ce qui a été examiné. Elle ne prouve ni identité ni authenticité.</text>
+</g></svg>

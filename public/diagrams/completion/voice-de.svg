@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="760" viewBox="0 0 1400 760" role="img" aria-labelledby="title desc" xml:lang="de">
+<title id="title">Sprachzugriff und Vertrauensgrenze</title><desc id="desc">Transkription und Sprachaktivitätserkennung authentifizieren keine sprechende Person.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#527a6c"/></marker></defs>
+<rect width="1400" height="760" rx="28" fill="#f4f7f2"/>
+<g font-family="Arial,Helvetica,sans-serif">
+<text x="62" y="67" fill="#527a6c" font-size="17" font-weight="700">OKNEF  /  DE</text>
+<text x="62" y="119" fill="#183e37" font-size="34" font-weight="700">Sprachzugriff und Vertrauensgrenze</text>
+<path d="M 612 239 L 744 239" stroke="#527a6c" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+<path d="M 850 306 L 500 362" stroke="#527a6c" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+<path d="M 1020 306 L 1020 362" stroke="#527a6c" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+<path d="M 338 490 L 402 590" stroke="#527a6c" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+<rect x="62" y="178" width="550" height="126" rx="17" fill="white" stroke="#c5d4cb" stroke-width="2"/>
+<text x="86" y="212" fill="#527a6c" font-size="15" font-weight="700">01</text>
+<text x="86" y="244" fill="#183e37" font-size="23" font-weight="700">Im Arbeitsbereich anmelden</text>
+<text x="86" y="277" fill="#183e37" font-size="19" font-weight="400">Konto- und Mandantenzugriff herstellen</text>
+<rect x="744" y="178" width="550" height="126" rx="17" fill="white" stroke="#c5d4cb" stroke-width="2"/>
+<text x="768" y="212" fill="#527a6c" font-size="15" font-weight="700">02</text>
+<text x="768" y="244" fill="#183e37" font-size="23" font-weight="700">Sprachrichtlinie wählen</text>
+<text x="768" y="277" fill="#183e37" font-size="19" font-weight="400">Gespräch oder nur vertraute Stimmen</text>
+<rect x="62" y="362" width="550" height="126" rx="17" fill="white" stroke="#c5d4cb" stroke-width="2"/>
+<text x="86" y="396" fill="#527a6c" font-size="15" font-weight="700">03</text>
+<text x="86" y="428" fill="#183e37" font-size="23" font-weight="700">Normales Gespräch</text>
+<text x="86" y="461" fill="#183e37" font-size="19" font-weight="400">Mikrofonfreigabe, Stummschaltung und VAD</text>
+<rect x="744" y="362" width="550" height="126" rx="17" fill="white" stroke="#c5d4cb" stroke-width="2"/>
+<text x="768" y="396" fill="#527a6c" font-size="15" font-weight="700">04</text>
+<text x="768" y="428" fill="#183e37" font-size="23" font-weight="700">Nur vertraute Stimmen</text>
+<text x="768" y="461" fill="#183e37" font-size="19" font-weight="400">Ohne konfigurierten Prüfer sperren</text>
+<rect x="402" y="546" width="550" height="126" rx="17" fill="white" stroke="#c5d4cb" stroke-width="2"/>
+<text x="426" y="580" fill="#527a6c" font-size="15" font-weight="700">05</text>
+<text x="426" y="612" fill="#183e37" font-size="23" font-weight="700">Sensible Aktionen bestätigen</text>
+<text x="426" y="645" fill="#183e37" font-size="19" font-weight="400">Stimme genehmigt keine Schlüsselfreigabe</text>
+<text x="62" y="707" fill="#42564e" font-size="19" font-weight="400">Transkription und Sprachaktivitätserkennung authentifizieren keine sprechende Person.</text>
+</g></svg>

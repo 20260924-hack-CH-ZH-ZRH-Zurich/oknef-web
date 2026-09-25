@@ -1,0 +1,31 @@
+{
+  "executed_actions": [],
+  "findings": [
+    {
+      "agent": "inventory",
+      "answer": "The supplied account metadata is empty. The evidence describes only a synthetic bank account and phone subscription—not verified holdings. I can identify inventory gaps and potential impersonation risks, but there is no evidence of actual fraud. No actions have been performed.",
+      "source": "openclaw-via-rust-core"
+    },
+    {
+      "agent": "succession",
+      "answer": "This checklist is for human and provider review only. The bank account and phone subscription are synthetic examples, not verified holdings. No provider, jurisdiction, account ownership or representative authority has been established. The risks below are possibilities, not findings of fraud. No actions have been performed; succession release is disabled in this implementation. This is planning guidance, not legal advice.",
+      "source": "openclaw-via-rust-core"
+    }
+  ],
+  "id": "workflow-contract-fixture",
+  "provider": "openclaw-via-rust-core",
+  "review": {
+    "agent": "verifier",
+    "answer": "The excerpts are appropriately cautious: they do not establish verified holdings or actual fraud, and they propose no unsafe actions. However, references to synthetic assets, a checklist and “risks below” cannot be checked against the supplied material. This assessment is limited to the excerpts and empty account metadata; the runtime text does not establish authority or verify any claims.",
+    "source": "openclaw-via-rust-core"
+  },
+  "status": "needs_human_review",
+  "workflow": "legacy-review",
+  "catalog_version": "test-fixture-v2",
+  "skill_ids": ["evidence-inventory", "provider-succession"],
+  "review_scope": {
+    "truncated": false,
+    "input_characters": 2000,
+    "reviewed_characters": 2000
+  }
+}

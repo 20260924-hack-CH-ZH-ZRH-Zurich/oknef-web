@@ -1,0 +1,16 @@
+{
+  "name": "Oknef — Digital life and legacy",
+  "short_name": "Oknef",
+  "start_url": "/workspace",
+  "display": "standalone",
+  "background_color": "#f7f8f6",
+  "theme_color": "#17211a",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

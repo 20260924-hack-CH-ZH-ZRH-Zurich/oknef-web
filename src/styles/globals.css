@@ -1,0 +1,163 @@
+@import "tailwindcss";
+:root {
+  --background: #f7f8f6;
+  --surface: #ffffff;
+  --muted: #edf0eb;
+  --foreground: #1b231e;
+  --secondary: #6e7870;
+  --border: #e3e8e0;
+  --accent: #c4ef78;
+  --accent-ink: #20340a;
+  --rail: #17211a;
+  --rail-muted: #9ca99f;
+  --danger: #a1343d;
+  --danger-soft: #fff1f0;
+  --good: #35794c;
+  --shadow: 0 0.5rem 2rem #18281908;
+  --font-sans: Arial, Helvetica, sans-serif;
+}
+[data-theme="dark"] {
+  --background: #151b17;
+  --surface: #1d2620;
+  --muted: #27332b;
+  --foreground: #f0f3ee;
+  --secondary: #a6b3aa;
+  --border: #344139;
+  --accent: #c4ef78;
+  --accent-ink: #20340a;
+  --rail: #101612;
+  --rail-muted: #a6b3aa;
+  --danger: #ff9c9c;
+  --danger-soft: #412b2c;
+  --good: #95d4a9;
+  --shadow: 0 0.5rem 2rem #0002;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not([data-theme="dark"]) {
+    --background: #151b17;
+    --surface: #1d2620;
+    --muted: #27332b;
+    --foreground: #f0f3ee;
+    --secondary: #a6b3aa;
+    --border: #344139;
+    --rail: #101612;
+    --rail-muted: #a6b3aa;
+    --danger: #ff9c9c;
+    --danger-soft: #412b2c;
+    --good: #95d4a9;
+  }
+}
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-muted: var(--muted);
+  --color-foreground: var(--foreground);
+  --color-secondary: var(--secondary);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-rail: var(--rail);
+  --color-rail-muted: var(--rail-muted);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-good: var(--good);
+  --font-sans: var(--font-sans);
+  --shadow-card: var(--shadow);
+}
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    margin: 0;
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    -webkit-tap-highlight-color: transparent;
+  }
+  button,
+  select {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+  button,
+  a,
+  input,
+  select,
+  textarea,
+  summary {
+    outline-offset: 0.25rem;
+  }
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  summary:focus-visible {
+    outline: 0.125rem solid var(--good);
+  }
+  input,
+  select,
+  textarea {
+    color: inherit;
+  }
+  select option {
+    background: var(--surface);
+    color: var(--foreground);
+  }
+  ::selection {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+}
+@layer components {
+  .icon-button {
+    @apply inline-flex size-9 items-center justify-center rounded-full border border-border bg-surface text-secondary transition hover:bg-muted hover:text-foreground;
+  }
+  .field {
+    @apply w-full rounded-xl border border-border bg-background px-3.5 py-3 text-sm outline-none focus:border-good;
+  }
+  .field-label {
+    @apply mb-2 block text-xs font-semibold text-foreground;
+  }
+  .panel {
+    @apply rounded-3xl border border-border bg-surface p-6 shadow-card;
+  }
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-widest text-secondary;
+  }
+  .page-title {
+    @apply text-3xl font-semibold tracking-tight md:text-4xl;
+  }
+  .subtext {
+    @apply text-sm leading-6 text-secondary;
+  }
+  .tag {
+    @apply inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-xs text-secondary;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must override animated utilities. */
+    animation-duration: 0.01ms !important;
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must override transitions. */
+    transition-duration: 0.01ms !important;
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must override smooth scrolling. */
+    scroll-behavior: auto !important;
+  }
+}

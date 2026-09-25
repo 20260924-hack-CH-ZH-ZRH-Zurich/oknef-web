@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="760" viewBox="0 0 1400 760" role="img" aria-labelledby="title desc" xml:lang="de">
+<title id="title">Eine Sitzung, verknüpfte Nachweise</title><desc id="desc">Eine Sitzung dokumentiert die Prüfung. Sie beweist weder Identität noch Echtheit.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#527a6c"/></marker></defs>
+<rect width="1400" height="760" rx="28" fill="#f4f7f2"/>
+<g font-family="Arial,Helvetica,sans-serif">
+<text x="62" y="67" fill="#527a6c" font-size="17" font-weight="700">OKNEF  /  DE</text>
+<text x="62" y="119" fill="#183e37" font-size="34" font-weight="700">Eine Sitzung, verknüpfte Nachweise</text>
+<path d="M 612 239 L 744 239" stroke="#527a6c" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+<path d="M 1020 306 L 340 362" stroke="#527a6c" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+<path d="M 612 424 L 744 424" stroke="#527a6c" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+<path d="M 1020 490 L 680 546" stroke="#527a6c" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+<rect x="62" y="178" width="550" height="126" rx="17" fill="white" stroke="#c5d4cb" stroke-width="2"/>
+<text x="86" y="212" fill="#527a6c" font-size="15" font-weight="700">01</text>
+<text x="86" y="244" fill="#183e37" font-size="23" font-weight="700">Chat oder Mini-App öffnen</text>
+<text x="86" y="277" fill="#183e37" font-size="19" font-weight="400">Aufgabe und Arbeitsbereich wählen</text>
+<rect x="744" y="178" width="550" height="126" rx="17" fill="white" stroke="#c5d4cb" stroke-width="2"/>
+<text x="768" y="212" fill="#527a6c" font-size="15" font-weight="700">02</text>
+<text x="768" y="244" fill="#183e37" font-size="23" font-weight="700">Mit Erlaubnis erfassen</text>
+<text x="768" y="277" fill="#183e37" font-size="19" font-weight="400">QR, Audio, Bild oder Dokument</text>
+<rect x="62" y="362" width="550" height="126" rx="17" fill="white" stroke="#c5d4cb" stroke-width="2"/>
+<text x="86" y="396" fill="#527a6c" font-size="15" font-weight="700">03</text>
+<text x="86" y="428" fill="#183e37" font-size="23" font-weight="700">Vor dem Senden prüfen</text>
+<text x="86" y="461" fill="#183e37" font-size="19" font-weight="400">Nur ausgewählte Nachweise teilen</text>
+<rect x="744" y="362" width="550" height="126" rx="17" fill="white" stroke="#c5d4cb" stroke-width="2"/>
+<text x="768" y="396" fill="#527a6c" font-size="15" font-weight="700">04</text>
+<text x="768" y="428" fill="#183e37" font-size="23" font-weight="700">Sitzung speichern</text>
+<text x="768" y="461" fill="#183e37" font-size="19" font-weight="400">Methode, Zeitpunkt und Grenzen behalten</text>
+<rect x="402" y="546" width="550" height="126" rx="17" fill="white" stroke="#c5d4cb" stroke-width="2"/>
+<text x="426" y="580" fill="#527a6c" font-size="15" font-weight="700">05</text>
+<text x="426" y="612" fill="#183e37" font-size="23" font-weight="700">Erneut öffnen und fragen</text>
+<text x="426" y="645" fill="#183e37" font-size="19" font-weight="400">Nachweise mit Assets und Aktionen verknüpfen</text>
+<text x="62" y="707" fill="#42564e" font-size="19" font-weight="400">Eine Sitzung dokumentiert die Prüfung. Sie beweist weder Identität noch Echtheit.</text>
+</g></svg>

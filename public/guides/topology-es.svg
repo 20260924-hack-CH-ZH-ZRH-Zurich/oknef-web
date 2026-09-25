@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc" xml:lang="es">
+<title id="title">Mapa de activos basado en evidencias</title><desc id="desc">Cada conexión describe evidencia guardada. El mapa cambia al añadir o actualizar registros y comprobaciones. No se deducen descubrimiento automático, escaneo de dispositivos, compromiso en vivo ni topología de red verificada.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#79efb6"/></marker></defs>
+<rect width="1280" height="720" rx="24" fill="#071b15"/>
+<g font-family="system-ui, sans-serif">
+<text x="54" y="62" font-size="18" fill="#79efb6">OKNEF · 2026-09-25</text>
+<text x="54" y="120" fill="#f3fff8" font-size="32">Mapa de activos basado en evidencias</text>
+<rect x="54" y="200" width="255" height="180" rx="18" fill="#143b2d" stroke="#39735b"/>
+<text x="76" y="240" font-size="18" fill="#79efb6">01</text>
+<text x="76" y="282" fill="#f3fff8" font-size="20">Cuentas y activos</text><text x="76" y="311" fill="#f3fff8" font-size="20">registrados</text>
+<path d="M 314 288 H 352" stroke="#79efb6" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="360" y="200" width="255" height="180" rx="18" fill="#143b2d" stroke="#39735b"/>
+<text x="382" y="240" font-size="18" fill="#79efb6">02</text>
+<text x="382" y="282" fill="#f3fff8" font-size="20">Sesiones aportadas por</text><text x="382" y="311" fill="#f3fff8" font-size="20">usuarios</text>
+<path d="M 620 288 H 658" stroke="#79efb6" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="666" y="200" width="255" height="180" rx="18" fill="#143b2d" stroke="#39735b"/>
+<text x="688" y="240" font-size="18" fill="#79efb6">03</text>
+<text x="688" y="282" fill="#f3fff8" font-size="20">Relaciones entre</text><text x="688" y="311" fill="#f3fff8" font-size="20">registros</text>
+<path d="M 926 288 H 964" stroke="#79efb6" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="972" y="200" width="255" height="180" rx="18" fill="#143b2d" stroke="#39735b"/>
+<text x="994" y="240" font-size="18" fill="#79efb6">04</text>
+<text x="994" y="282" fill="#f3fff8" font-size="20">Eventos e historial de</text><text x="994" y="311" fill="#f3fff8" font-size="20">revisión</text>
+<text x="54" y="448" fill="#c9dcd5" font-size="22">Cada conexión describe evidencia guardada. El mapa cambia al añadir o actualizar registros y</text><text x="54" y="479" fill="#c9dcd5" font-size="22">comprobaciones.</text>
+<rect x="38" y="550" width="1204" height="140" rx="18" fill="#2f3022"/>
+<text x="58" y="584" fill="#f0dca6" font-size="20">No se deducen descubrimiento automático, escaneo de dispositivos, compromiso en vivo ni topología de red</text><text x="58" y="613" fill="#f0dca6" font-size="20">verificada.</text>
+</g></svg>
