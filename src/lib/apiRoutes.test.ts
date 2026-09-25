@@ -6,6 +6,8 @@ test("only bounded security, membership and decision routes can reach the backen
     "security/overview",
     "security/sessions",
     "security/sessions/id/questions",
+    "security/sessions/capture",
+    "security/sessions/id/assets",
     "security/mode",
     "security/simulations",
     "workspaces/switch",
@@ -18,6 +20,8 @@ test("only bounded security, membership and decision routes can reach the backen
     expect(isPermittedEndpoint(path)).toBe(true);
   for (const path of [
     "security/sessions/id/delete/all",
+    "security/sessions/id/assets/execute",
+    "security/sessions/id/assets/extra",
     "security/export/secrets",
     "workspaces/../vault",
     "agents/execute",
