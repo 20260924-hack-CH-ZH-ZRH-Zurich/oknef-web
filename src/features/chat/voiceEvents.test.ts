@@ -112,6 +112,40 @@ describe("Realtime conversation events", () => {
     expect(h.errors).toBe(2);
     expect(JSON.stringify(h.sent)).not.toContain("private");
   });
+  test("keeps delayed user transcription before the assistant response and typed followup", () => {
+    const h = harness();
+    h.receive({ type: "input_audio_buffer.committed", item_id: "u1" });
+    h.receive({
+      type: "response.output_audio_transcript.done",
+      item_id: "a1",
+      transcript: "Opening QR",
+    });
+    expect(h.text).toHaveLength(0);
+    h.events.sendText("Please check the result");
+    expect(h.text).toHaveLength(0);
+    h.receive({
+      type: "conversation.item.input_audio_transcription.completed",
+      item_id: "u1",
+      transcript: "Open QR",
+    });
+    expect(h.text).toEqual([
+      { role: "user", text: "Open QR" },
+      { role: "assistant", text: "Opening QR" },
+      { role: "user", text: "Please check the result" },
+    ]);
+    h.receive({ type: "input_audio_buffer.committed", item_id: "empty" });
+    h.receive({
+      type: "response.output_audio_transcript.done",
+      item_id: "a2",
+      transcript: "Ready",
+    });
+    h.receive({
+      type: "conversation.item.input_audio_transcription.completed",
+      item_id: "empty",
+      transcript: "",
+    });
+    expect(h.text.at(-1)).toEqual({ role: "assistant", text: "Ready" });
+  });
   test("waits for complete response and successful async action before acknowledgement", async () => {
     let resolve!: (value: Record<string, unknown>) => void;
     let runs = 0;

@@ -23,6 +23,17 @@ export function voiceEvents(
   },
 ) {
   const seen = new Set<string>();
+  const transcripts: {
+    role: "user" | "assistant";
+    id?: string;
+    text?: string;
+  }[] = [];
+  const flushTranscripts = () => {
+    while (transcripts[0]?.text !== undefined) {
+      const entry = transcripts.shift();
+      if (entry?.text?.trim()) callbacks.onText(entry.role, entry.text);
+    }
+  };
   let active = false;
   let responsePending = false;
   let processing = Promise.resolve();
@@ -96,6 +107,14 @@ export function voiceEvents(
       return;
     }
     const type = message.type;
+    if (
+      type === "input_audio_buffer.committed" &&
+      typeof message.item_id === "string" &&
+      remember(`input:${message.item_id}`)
+    ) {
+      transcripts.push({ role: "user", id: message.item_id });
+      if (transcripts.length > 64) callbacks.onError();
+    }
     if (type === "session.created") callbacks.onReady();
     if (
       type === "error" ||
@@ -136,11 +155,18 @@ export function voiceEvents(
     ) {
       const transcript = message.transcript;
       const key = `${user ? "user" : "assistant"}:${message.item_id ?? message.response_id ?? message.event_id ?? transcript}:${message.content_index ?? 0}`;
-      if (typeof transcript === "string" && transcript.trim() && remember(key))
-        callbacks.onText(
-          user ? "user" : "assistant",
-          transcript.slice(0, 30000),
-        );
+      if (typeof transcript === "string" && remember(key)) {
+        const pending = user
+          ? transcripts.find((entry) => entry.id === message.item_id)
+          : undefined;
+        if (pending) pending.text = transcript.slice(0, 30000);
+        else
+          transcripts.push({
+            role: user ? "user" : "assistant",
+            text: transcript.slice(0, 30000),
+          });
+        flushTranscripts();
+      }
     }
   }
   function addMessage(message: VoiceMessage) {
@@ -165,7 +191,8 @@ export function voiceEvents(
     sendText: (content: string) => {
       if (!content.trim() || content.length > 12000) return false;
       if (!addMessage({ role: "user", content })) return false;
-      callbacks.onText("user", content);
+      transcripts.push({ role: "user", text: content });
+      flushTranscripts();
       if (active) send({ type: "response.cancel" });
       requestResponse();
       return true;
