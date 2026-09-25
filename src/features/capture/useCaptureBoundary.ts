@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { registerMediaStop } from "@/lib/mediaLifecycle";
+import { observeCaptureLifecycle } from "@/features/capture/lifecycle";
 
 export function useCaptureBoundary() {
   const state = useRef({
@@ -14,11 +14,9 @@ export function useCaptureBoundary() {
       state.current.controller.abort();
       state.current.controller = new AbortController();
     };
-    const dispose = registerMediaStop(stop);
-    window.addEventListener("pagehide", stop);
+    const dispose = observeCaptureLifecycle(stop);
     return () => {
       state.current.mounted = false;
-      window.removeEventListener("pagehide", stop);
       dispose();
     };
   }, []);

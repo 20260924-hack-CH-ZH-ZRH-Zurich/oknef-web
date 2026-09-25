@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/buttons/Button/Button";
+import { observeCaptureLifecycle } from "@/features/capture/lifecycle";
 import { startDictation } from "@/features/chat/voice";
 import { useProductMessages } from "@/features/product/messages";
-import { registerMediaStop, stopActiveMedia } from "@/lib/mediaLifecycle";
+import { stopActiveMedia } from "@/lib/mediaLifecycle";
 import { useCaptureMessages } from "./messages";
 
 export function AudioCapture({
@@ -36,11 +37,9 @@ export function AudioCapture({
   }, [recording, onRecordingChange]);
   useEffect(() => {
     mounted.current = true;
-    const dispose = registerMediaStop(cancel);
-    window.addEventListener("pagehide", cancel);
+    const dispose = observeCaptureLifecycle(cancel);
     return () => {
       mounted.current = false;
-      window.removeEventListener("pagehide", cancel);
       dispose();
     };
   }, [cancel]);

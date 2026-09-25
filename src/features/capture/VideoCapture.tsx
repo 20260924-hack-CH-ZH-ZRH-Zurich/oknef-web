@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/buttons/Button/Button";
-import { registerMediaStop, stopActiveMedia } from "@/lib/mediaLifecycle";
+import { observeCaptureLifecycle } from "@/features/capture/lifecycle";
+import { stopActiveMedia } from "@/lib/mediaLifecycle";
 import { useCaptureMessages } from "./messages";
 import { recordStream } from "./recording";
 
@@ -37,11 +38,9 @@ export function VideoCapture({
   }, []);
   useEffect(() => {
     mounted.current = true;
-    const dispose = registerMediaStop(cancel);
-    window.addEventListener("pagehide", cancel);
+    const dispose = observeCaptureLifecycle(cancel);
     return () => {
       mounted.current = false;
-      window.removeEventListener("pagehide", cancel);
       dispose();
     };
   }, [cancel]);

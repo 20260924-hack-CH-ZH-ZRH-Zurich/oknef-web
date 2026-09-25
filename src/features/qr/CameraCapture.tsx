@@ -1,8 +1,8 @@
 import { Camera, CameraOff } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/buttons/Button/Button";
+import { observeCaptureLifecycle } from "@/features/capture/lifecycle";
 import { useProductMessages } from "@/features/product/messages";
-import { registerMediaStop } from "@/lib/mediaLifecycle";
 export function CameraCapture({
   onCapture,
   facingMode = "environment",
@@ -40,11 +40,9 @@ export function CameraCapture({
   }, []);
   useEffect(() => {
     mounted.current = true;
-    const dispose = registerMediaStop(stop);
-    window.addEventListener("pagehide", stop);
+    const dispose = observeCaptureLifecycle(stop);
     return () => {
       mounted.current = false;
-      window.removeEventListener("pagehide", stop);
       dispose();
     };
   }, [stop]);

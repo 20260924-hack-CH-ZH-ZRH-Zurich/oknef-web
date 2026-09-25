@@ -3,6 +3,7 @@ import { z } from "zod";
 import { Button } from "@/components/ui/buttons/Button/Button";
 import { AudioCapture } from "@/features/capture/AudioCapture";
 import { ImagePreview } from "@/features/capture/ImagePreview";
+import { observeCaptureLifecycle } from "@/features/capture/lifecycle";
 import { useCaptureMessages } from "@/features/capture/messages";
 import { VideoCapture } from "@/features/capture/VideoCapture";
 import { DocumentResult } from "@/features/chat/DocumentResult";
@@ -12,7 +13,6 @@ import { useProductMessages } from "@/features/product/messages";
 import { CameraCapture } from "@/features/qr/CameraCapture";
 import type { SessionKind } from "@/features/security/contracts";
 import { api } from "@/lib/api";
-import { registerMediaStop } from "@/lib/mediaLifecycle";
 import type { Evidence } from "./localStore";
 import { analyzeMedia } from "./mediaAnalysis";
 
@@ -56,11 +56,9 @@ export function MediaEvidence({
         setPending(false);
       }
     };
-    const dispose = registerMediaStop(stop);
-    window.addEventListener("pagehide", stop);
+    const dispose = observeCaptureLifecycle(stop);
     return () => {
       mounted.current = false;
-      window.removeEventListener("pagehide", stop);
       dispose();
     };
   }, []);
